@@ -64,7 +64,9 @@
             </plugin>
         </plugins>    
     </build>
-    
+    <modules>
+        <module>library-model</module>
+    </modules>
     <dependencyManagement>
         <dependencies>
             <dependency>
