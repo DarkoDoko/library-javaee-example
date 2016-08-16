@@ -2,24 +2,25 @@ package com.library.app.category.repository;
 
 import com.library.app.category.model.Category;
 import static com.library.app.commontests.category.CategoryForTestsRepository.java;
+import com.library.app.commontests.utils.DBCommandTransactionalExecutor;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import org.junit.After;
-import org.junit.Assert;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class CategoryRepositoryUTest {
     
     private EntityManagerFactory emf;
     private EntityManager em;
     private CategoryRepository cr;
+    private DBCommandTransactionalExecutor executor; 
     
     @Before
     public void initTestCase() {
@@ -28,6 +29,8 @@ public class CategoryRepositoryUTest {
         
         cr = new CategoryRepository();
         cr.em = em;
+        
+        executor = new DBCommandTransactionalExecutor(em);
     }
     
     @After
@@ -39,21 +42,11 @@ public class CategoryRepositoryUTest {
     @Test
     public void addCategoryAndFindIt(){
         
-        Long categoryAddedId = null;
+        Long categoryAddedId = executor.executeCommand(() -> {
+            return cr.add(java()).getId();
+        });
         
-        try{
-            
-            em.getTransaction().begin();
-            categoryAddedId = cr.add(java()).getId();
-
-            assertThat(categoryAddedId, is(notNullValue()));
-
-            em.getTransaction().commit();
-            em.clear();
-        } catch(Exception e){
-            fail("Exception should not have been thrown");
-            em.getTransaction().rollback();
-        }
+        assertThat(categoryAddedId, is(notNullValue()));
         
         Category category = cr.findById(categoryAddedId);
         assertThat(category, is(notNullValue()));
