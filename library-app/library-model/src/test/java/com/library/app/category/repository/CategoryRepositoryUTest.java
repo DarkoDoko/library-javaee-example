@@ -1,7 +1,6 @@
 package com.library.app.category.repository;
 
 import com.library.app.category.model.Category;
-import com.library.app.commontests.category.CategoryForTestsRepository;
 import static com.library.app.commontests.category.CategoryForTestsRepository.allCategories;
 import static com.library.app.commontests.category.CategoryForTestsRepository.architecture;
 import static com.library.app.commontests.category.CategoryForTestsRepository.cleanCode;
@@ -20,7 +19,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 public class CategoryRepositoryUTest {
     
