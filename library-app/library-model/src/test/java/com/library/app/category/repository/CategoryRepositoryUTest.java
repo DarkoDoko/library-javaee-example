@@ -118,4 +118,31 @@ public class CategoryRepositoryUTest {
         assertThat("Non-existing element reported as existing.", 
                 repository.alreadyExists(cleanCode()), is(equalTo(false)));
     }
+    
+    @Test
+    public void alreadyExistsCategoryWithId(){
+        Category java = executor.executeCommand(() -> {
+            repository.add(cleanCode());
+            return repository.add(java());
+        });
+        
+        assertThat(repository.alreadyExists(java), is(equalTo(false)));
+        
+        java.setName(cleanCode().getName());
+        assertThat(repository.alreadyExists(java), is(equalTo(true)));
+        
+        java.setName(networks().getName());
+        assertThat(repository.alreadyExists(java), is(equalTo(false)));
+    }
+    
+    @Test
+    public void existsById(){
+        Long categoryAddedId = executor.executeCommand(() -> {
+            return repository.add(java()).getId();
+        });
+
+        assertThat(repository.existsById(categoryAddedId), is(equalTo(true)));
+        assertThat(repository.existsById(999L), is(equalTo(false)));
+        
+    }
 }
