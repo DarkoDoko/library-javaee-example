@@ -106,4 +106,16 @@ public class CategoryRepositoryUTest {
         assertThat(categories.get(2).getName(), is(equalTo(java().getName())));
         assertThat(categories.get(3).getName(), is(equalTo(networks().getName())));
     }
+    
+    @Test
+    public void alreadyExistsForAdd(){
+        executor.executeCommand(() -> {
+            repository.add(java());
+            return null;
+        });
+        assertThat("Existing element reported as non-existing.", 
+                repository.alreadyExists(java()), is(equalTo(true)));
+        assertThat("Non-existing element reported as existing.", 
+                repository.alreadyExists(cleanCode()), is(equalTo(false)));
+    }
 }
