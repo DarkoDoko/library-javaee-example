@@ -2,9 +2,13 @@ package com.library.app.category.repository;
 
 import com.library.app.category.model.Category;
 import com.library.app.commontests.category.CategoryForTestsRepository;
+import static com.library.app.commontests.category.CategoryForTestsRepository.allCategories;
+import static com.library.app.commontests.category.CategoryForTestsRepository.architecture;
 import static com.library.app.commontests.category.CategoryForTestsRepository.cleanCode;
 import static com.library.app.commontests.category.CategoryForTestsRepository.java;
+import static com.library.app.commontests.category.CategoryForTestsRepository.networks;
 import com.library.app.commontests.utils.DBCommandTransactionalExecutor;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -85,5 +89,21 @@ public class CategoryRepositoryUTest {
         
         Category categoryAfterUpdate = repository.findById(categoryAddedId);
         assertThat(categoryAfterUpdate.getName(), is(equalTo(cleanCode().getName())));
+    }
+    
+    @Test
+    public void findAllCategories(){
+        executor.executeCommand(() -> {
+            allCategories().forEach(repository::add);
+            return null;
+        });
+        
+        List<Category> categories = repository.findAll("name");
+        
+        assertThat(categories.size(), is(equalTo(4)));
+        assertThat(categories.get(0).getName(), is(equalTo(architecture().getName())));
+        assertThat(categories.get(1).getName(), is(equalTo(cleanCode().getName())));
+        assertThat(categories.get(2).getName(), is(equalTo(java().getName())));
+        assertThat(categories.get(3).getName(), is(equalTo(networks().getName())));
     }
 }

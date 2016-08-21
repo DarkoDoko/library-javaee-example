@@ -1,6 +1,7 @@
 package com.library.app.category.repository;
 
 import com.library.app.category.model.Category;
+import java.util.List;
 import javax.persistence.EntityManager;
 
 /**
@@ -25,5 +26,9 @@ public class CategoryRepository {
 
     public void update(Category category) {
         em.merge(category);
+    }
+
+    public List<Category> findAll(String orderField) {
+        return em.createQuery("SELECT e FROM Category e ORDER BY e." + orderField).getResultList();
     }
 }
