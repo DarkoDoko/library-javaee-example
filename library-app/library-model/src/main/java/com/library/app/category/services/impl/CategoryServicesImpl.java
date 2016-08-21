@@ -1,5 +1,6 @@
 package com.library.app.category.services.impl;
 
+import com.library.app.category.exception.CategoryExistentException;
 import com.library.app.category.model.Category;
 import com.library.app.category.repository.CategoryRepository;
 import com.library.app.category.services.CategoryServices;
@@ -28,6 +29,10 @@ public class CategoryServicesImpl implements CategoryServices{
         if(iterErrors.hasNext()) {
             ConstraintViolation<Category> violation = iterErrors.next();
             throw new FieldNotValidException(violation.getPropertyPath().toString(), violation.getMessage());
+        }
+        
+        if(repository.alreadyExists(category)){
+            throw new CategoryExistentException();
         }
         
         return repository.add(category);
