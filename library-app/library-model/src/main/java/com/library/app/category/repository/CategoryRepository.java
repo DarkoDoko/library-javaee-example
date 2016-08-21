@@ -17,6 +17,9 @@ public class CategoryRepository {
     }
     
     public Category findById(Long id){
+        if(id == null){
+            return null;
+        }
         return em.find(Category.class, id);
     }
 }

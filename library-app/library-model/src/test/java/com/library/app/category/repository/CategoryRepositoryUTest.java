@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -19,7 +20,7 @@ public class CategoryRepositoryUTest {
     
     private EntityManagerFactory emf;
     private EntityManager em;
-    private CategoryRepository cr;
+    private CategoryRepository repository;
     private DBCommandTransactionalExecutor executor; 
     
     @Before
@@ -27,8 +28,8 @@ public class CategoryRepositoryUTest {
         emf = Persistence.createEntityManagerFactory("libraryPU");
         em = emf.createEntityManager();
         
-        cr = new CategoryRepository();
-        cr.em = em;
+        repository = new CategoryRepository();
+        repository.em = em;
         
         executor = new DBCommandTransactionalExecutor(em);
     }
@@ -43,13 +44,25 @@ public class CategoryRepositoryUTest {
     public void addCategoryAndFindIt(){
         
         Long categoryAddedId = executor.executeCommand(() -> {
-            return cr.add(java()).getId();
+            return repository.add(java()).getId();
         });
         
         assertThat(categoryAddedId, is(notNullValue()));
         
-        Category category = cr.findById(categoryAddedId);
+        Category category = repository.findById(categoryAddedId);
         assertThat(category, is(notNullValue()));
         assertThat(category.getName(), is(equalTo(java().getName())));
+    }
+    
+    @Test
+    public void findCategoryByIdNotFound(){
+        Category cat = repository.findById(999L);
+        assertThat(cat, is(nullValue()));
+    }
+    
+    @Test
+    public void findCategoryByIdWithNullId() {
+        Category category = repository.findById(null);
+        assertThat(category, is(nullValue()));
     }
 }
