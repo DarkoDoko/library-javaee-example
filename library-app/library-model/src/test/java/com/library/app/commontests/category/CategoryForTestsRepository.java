@@ -13,7 +13,7 @@ import org.junit.Ignore;
 public class CategoryForTestsRepository {
 
     public static Category java() {
-        return new Category("java");
+        return new Category("Java");
     }
 
     public static Category cleanCode() {
