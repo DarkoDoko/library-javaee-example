@@ -1,6 +1,8 @@
 package com.library.app.category.repository;
 
 import com.library.app.category.model.Category;
+import com.library.app.commontests.category.CategoryForTestsRepository;
+import static com.library.app.commontests.category.CategoryForTestsRepository.cleanCode;
 import static com.library.app.commontests.category.CategoryForTestsRepository.java;
 import com.library.app.commontests.utils.DBCommandTransactionalExecutor;
 import javax.persistence.EntityManager;
@@ -64,5 +66,24 @@ public class CategoryRepositoryUTest {
     public void findCategoryByIdWithNullId() {
         Category category = repository.findById(null);
         assertThat(category, is(nullValue()));
+    }
+    
+    @Test
+    public void updateCategory(){
+        Long categoryAddedId = executor.executeCommand(() -> {
+            return repository.add(java()).getId();
+        });
+        
+        Category categoryAfterAdd = repository.findById(categoryAddedId);
+        assertThat(categoryAfterAdd.getName(), is(equalTo(java().getName())));
+        
+        categoryAfterAdd.setName(cleanCode().getName());
+        executor.executeCommand(() -> {
+            repository.update(categoryAfterAdd);
+            return null;
+        });
+        
+        Category categoryAfterUpdate = repository.findById(categoryAddedId);
+        assertThat(categoryAfterUpdate.getName(), is(equalTo(cleanCode().getName())));
     }
 }
