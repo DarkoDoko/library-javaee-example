@@ -4,6 +4,7 @@ import com.library.app.category.exception.CategoryExistentException;
 import com.library.app.category.exception.CategoryNotFoundException;
 import com.library.app.category.model.Category;
 import com.library.app.common.exception.FieldNotValidException;
+import java.util.List;
 
 /**
  *
@@ -15,6 +16,8 @@ public interface CategoryServices {
 
     void update(Category category) throws FieldNotValidException, CategoryNotFoundException;
 
-    Category findById(long l);
+    Category findById(long id) throws CategoryNotFoundException;
+
+    List<Category> findAll();
     
 }

@@ -7,6 +7,7 @@ import com.library.app.category.repository.CategoryRepository;
 import com.library.app.category.services.CategoryServices;
 import com.library.app.common.exception.FieldNotValidException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
@@ -69,6 +70,13 @@ public class CategoryServicesImpl implements CategoryServices{
         }
         
         return category;
+    }
+
+    @Override
+    public List<Category> findAll() {
+        List<Category> categories = repository.findAll("name");
+        
+        return categories;
     }
     
 }

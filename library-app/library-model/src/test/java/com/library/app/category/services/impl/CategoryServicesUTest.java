@@ -8,6 +8,8 @@ import com.library.app.category.services.CategoryServices;
 import com.library.app.common.exception.FieldNotValidException;
 import static com.library.app.commontests.category.CategoryForTestsRepository.categoryWithId;
 import static com.library.app.commontests.category.CategoryForTestsRepository.java;
+import java.util.ArrayList;
+import java.util.List;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -129,6 +131,15 @@ public class CategoryServicesUTest {
         when(repository.findById(1L)).thenReturn(null);
         
         services.findById(1L);
+    }
+    
+    @Test
+    public void findAllNoCategories(){
+        when(repository.findAll("name")).thenReturn(new ArrayList<>());
+        
+        List<Category> categories = services.findAll();
+        
+        assertThat(categories.isEmpty(), is(equalTo(true)));
     }
 
     private void addCategoryWithInvalidName(String name) {
