@@ -17,6 +17,7 @@ import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -98,6 +99,16 @@ public class CategoryServicesUTest {
         when(repository.existsById(1L)).thenReturn(false);
         
         services.update(categoryWithId(java(), 1L));
+    }
+    
+    @Test
+    public void updateValidCategory(){
+        when(repository.alreadyExists(categoryWithId(java(), 1L))).thenReturn(false);
+        when(repository.existsById(1L)).thenReturn(true);
+        
+        services.update(categoryWithId(java(), 1L));
+        
+        verify(repository).update(categoryWithId(java(), 1L));
     }
 
     private void addCategoryWithInvalidName(String name) {
