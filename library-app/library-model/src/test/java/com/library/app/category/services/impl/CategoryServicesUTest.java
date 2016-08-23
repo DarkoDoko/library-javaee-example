@@ -7,8 +7,10 @@ import com.library.app.category.repository.CategoryRepository;
 import com.library.app.category.services.CategoryServices;
 import com.library.app.common.exception.FieldNotValidException;
 import static com.library.app.commontests.category.CategoryForTestsRepository.categoryWithId;
+import static com.library.app.commontests.category.CategoryForTestsRepository.cleanCode;
 import static com.library.app.commontests.category.CategoryForTestsRepository.java;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -140,6 +142,19 @@ public class CategoryServicesUTest {
         List<Category> categories = services.findAll();
         
         assertThat(categories.isEmpty(), is(equalTo(true)));
+    }
+    
+    @Test
+    public void findAllCategories(){
+        when(repository.findAll("name")).thenReturn(
+                Arrays.asList(categoryWithId(java(), 1L), categoryWithId(cleanCode(), 2L)));
+        
+        List<Category> categories = services.findAll();
+        
+        assertThat(categories, is(notNullValue()));
+        assertThat(categories.size(), is(equalTo(2)));
+        assertThat(categories.get(0).getName(), is(equalTo(java().getName())));
+        assertThat(categories.get(1).getName(), is(equalTo(cleanCode().getName())));
     }
 
     private void addCategoryWithInvalidName(String name) {
