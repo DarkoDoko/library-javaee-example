@@ -37,5 +37,18 @@ public class CategoryServicesImpl implements CategoryServices{
         
         return repository.add(category);
     }
+
+    @Override
+    public void update(Category category) {
+        Set<ConstraintViolation<Category>> errors = validator.validate(category);
+        Iterator<ConstraintViolation<Category>> iterErrors = errors.iterator();
+        
+        if(iterErrors.hasNext()){
+            ConstraintViolation<Category> violation = iterErrors.next();
+            throw new FieldNotValidException(violation.getPropertyPath().toString(), violation.getMessage());
+        }
+        
+        repository.update(category);
+    }
     
 }

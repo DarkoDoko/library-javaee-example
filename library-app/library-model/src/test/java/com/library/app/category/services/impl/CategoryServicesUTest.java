@@ -68,6 +68,21 @@ public class CategoryServicesUTest {
         
         services.add(java());
     }
+    
+    @Test
+    public void updateCategoryWithNullName(){
+        updateCategoryWithInvalidName(null);
+    }
+    
+    @Test
+    public void updateCategoryWithShortName(){
+        updateCategoryWithInvalidName("A");
+    }
+    
+    @Test
+    public void updateCategoryWithLongName(){
+        updateCategoryWithInvalidName("This is a long name that will cause an exception to be thrown");
+    }
 
     private void addCategoryWithInvalidName(String name) {
         try{
@@ -75,8 +90,16 @@ public class CategoryServicesUTest {
             fail("An error should have been thrown");
         } catch (FieldNotValidException e){
             assertThat(e.getFieldName(), is(equalTo("name")));
-        }
-        
+        }   
+    }
+    
+    private void updateCategoryWithInvalidName(String name) {
+        try{
+            services.update(new Category(name));
+            fail("An error should have been thrown");
+        } catch (FieldNotValidException e){
+            assertThat(e.getFieldName(), is(equalTo("name")));
+        }   
     }
     
 }
