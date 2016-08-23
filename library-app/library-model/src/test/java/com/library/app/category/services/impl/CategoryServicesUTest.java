@@ -83,6 +83,13 @@ public class CategoryServicesUTest {
     public void updateCategoryWithLongName(){
         updateCategoryWithInvalidName("This is a long name that will cause an exception to be thrown");
     }
+    
+    @Test(expected = CategoryExistentException.class)
+    public void updateCategoryWithExistantName(){
+        when(repository.alreadyExists(categoryWithId(java(), 1L))).thenReturn(true);
+        
+        services.update(categoryWithId(java(), 1L));
+    }
 
     private void addCategoryWithInvalidName(String name) {
         try{

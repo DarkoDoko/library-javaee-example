@@ -48,6 +48,10 @@ public class CategoryServicesImpl implements CategoryServices{
             throw new FieldNotValidException(violation.getPropertyPath().toString(), violation.getMessage());
         }
         
+        if(!repository.existsById(category.getId())){
+            throw new CategoryExistentException();
+        }
+        
         repository.update(category);
     }
     
