@@ -12,6 +12,8 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import org.hamcrest.core.IsNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import org.junit.Before;
@@ -109,6 +111,17 @@ public class CategoryServicesUTest {
         services.update(categoryWithId(java(), 1L));
         
         verify(repository).update(categoryWithId(java(), 1L));
+    }
+    
+    @Test
+    public void findCategoryById(){
+        when(repository.findById(1L)).thenReturn(categoryWithId(java(), 1L));
+        
+        Category category = services.findById(1L);
+        
+        assertThat(category, is(notNullValue()));
+        assertThat(category.getId(), is(equalTo(1L)));
+        assertThat(category.getName(), is(equalTo(java().getName())));
     }
 
     private void addCategoryWithInvalidName(String name) {

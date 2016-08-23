@@ -59,5 +59,12 @@ public class CategoryServicesImpl implements CategoryServices{
         
         repository.update(category);
     }
+
+    @Override
+    public Category findById(long l) {
+        Category category = repository.findById(l);
+        
+        return category;
+    }
     
 }
