@@ -15,12 +15,14 @@ import org.junit.Before;
 import org.mockito.Mock;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 /**
  *
  * @author ddoko
  */
-public class CategoryResourceUTest {
+public class CategoryResourceTest {
     
     private CategoryResource resource;
     
