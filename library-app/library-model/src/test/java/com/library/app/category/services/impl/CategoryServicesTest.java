@@ -17,7 +17,6 @@ import javax.validation.Validator;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import org.hamcrest.core.IsNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import org.junit.Before;
@@ -25,14 +24,20 @@ import org.junit.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  *
  * @author ddoko
  */
-public class CategoryServicesUTest {
+public class CategoryServicesTest {
     
-    private CategoryServices services;
+    private CategoryServices servicesUnderTest;
     private CategoryRepository repository;
     private Validator validator;
     
@@ -40,10 +45,10 @@ public class CategoryServicesUTest {
     public void init(){
         validator = Validation.buildDefaultValidatorFactory().getValidator();
         repository = mock(CategoryRepository.class);
-        services = new CategoryServicesImpl();
+        servicesUnderTest = new CategoryServicesImpl();
         
-        ((CategoryServicesImpl) services).validator = validator;
-        ((CategoryServicesImpl) services).repository = repository;
+        ((CategoryServicesImpl) servicesUnderTest).validator = validator;
+        ((CategoryServicesImpl) servicesUnderTest).repository = repository;
     }
     
     @Test
@@ -66,7 +71,7 @@ public class CategoryServicesUTest {
         when(repository.alreadyExists(java())).thenReturn(false);
         when(repository.add(java())).thenReturn(categoryWithId(java(), 1L));
         
-        Category added = services.add(java());
+        Category added = servicesUnderTest.add(java());
         assertThat(added.getId(), is(equalTo(1L)));
     }
 
@@ -74,7 +79,7 @@ public class CategoryServicesUTest {
     public void addCategoryWithExistantName(){
         when(repository.alreadyExists(java())).thenReturn(true);
         
-        services.add(java());
+        servicesUnderTest.add(java());
     }
     
     @Test
@@ -96,7 +101,7 @@ public class CategoryServicesUTest {
     public void updateCategoryWithExistantName(){
         when(repository.alreadyExists(categoryWithId(java(), 1L))).thenReturn(true);
         
-        services.update(categoryWithId(java(), 1L));
+        servicesUnderTest.update(categoryWithId(java(), 1L));
     }
     
     @Test(expected = CategoryNotFoundException.class)
@@ -104,7 +109,7 @@ public class CategoryServicesUTest {
         when(repository.alreadyExists(categoryWithId(java(), 1L))).thenReturn(false);
         when(repository.existsById(1L)).thenReturn(false);
         
-        services.update(categoryWithId(java(), 1L));
+        servicesUnderTest.update(categoryWithId(java(), 1L));
     }
     
     @Test
@@ -112,7 +117,7 @@ public class CategoryServicesUTest {
         when(repository.alreadyExists(categoryWithId(java(), 1L))).thenReturn(false);
         when(repository.existsById(1L)).thenReturn(true);
         
-        services.update(categoryWithId(java(), 1L));
+        servicesUnderTest.update(categoryWithId(java(), 1L));
         
         verify(repository).update(categoryWithId(java(), 1L));
     }
@@ -121,7 +126,7 @@ public class CategoryServicesUTest {
     public void findCategoryById(){
         when(repository.findById(1L)).thenReturn(categoryWithId(java(), 1L));
         
-        Category category = services.findById(1L);
+        Category category = servicesUnderTest.findById(1L);
         
         assertThat(category, is(notNullValue()));
         assertThat(category.getId(), is(equalTo(1L)));
@@ -132,14 +137,14 @@ public class CategoryServicesUTest {
     public void findCategotyByIdNotFound(){
         when(repository.findById(1L)).thenReturn(null);
         
-        services.findById(1L);
+        servicesUnderTest.findById(1L);
     }
     
     @Test
     public void findAllNoCategories(){
         when(repository.findAll("name")).thenReturn(new ArrayList<>());
         
-        List<Category> categories = services.findAll();
+        List<Category> categories = servicesUnderTest.findAll();
         
         assertThat(categories.isEmpty(), is(equalTo(true)));
     }
@@ -149,7 +154,7 @@ public class CategoryServicesUTest {
         when(repository.findAll("name")).thenReturn(
                 Arrays.asList(categoryWithId(java(), 1L), categoryWithId(cleanCode(), 2L)));
         
-        List<Category> categories = services.findAll();
+        List<Category> categories = servicesUnderTest.findAll();
         
         assertThat(categories, is(notNullValue()));
         assertThat(categories.size(), is(equalTo(2)));
@@ -159,7 +164,7 @@ public class CategoryServicesUTest {
 
     private void addCategoryWithInvalidName(String name) {
         try{
-            services.add(new Category(name));
+            servicesUnderTest.add(new Category(name));
             fail("An error should have been thrown");
         } catch (FieldNotValidException e){
             assertThat(e.getFieldName(), is(equalTo("name")));
@@ -168,7 +173,7 @@ public class CategoryServicesUTest {
     
     private void updateCategoryWithInvalidName(String name) {
         try{
-            services.update(new Category(name));
+            servicesUnderTest.update(new Category(name));
             fail("An error should have been thrown");
         } catch (FieldNotValidException e){
             assertThat(e.getFieldName(), is(equalTo("name")));
