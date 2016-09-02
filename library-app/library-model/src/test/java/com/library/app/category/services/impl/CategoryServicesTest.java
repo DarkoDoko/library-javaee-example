@@ -30,6 +30,18 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  *
@@ -45,6 +57,7 @@ public class CategoryServicesTest {
     public void init(){
         validator = Validation.buildDefaultValidatorFactory().getValidator();
         repository = mock(CategoryRepository.class);
+        
         servicesUnderTest = new CategoryServicesImpl();
         
         ((CategoryServicesImpl) servicesUnderTest).validator = validator;
@@ -134,7 +147,7 @@ public class CategoryServicesTest {
     }
     
     @Test(expected = CategoryNotFoundException.class)
-    public void findCategotyByIdNotFound(){
+    public void findCategoryByIdNotFound(){
         when(repository.findById(1L)).thenReturn(null);
         
         servicesUnderTest.findById(1L);
