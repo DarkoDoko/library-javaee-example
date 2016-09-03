@@ -24,16 +24,17 @@ public class CategoryRepositoryTest {
     
     private EntityManagerFactory emf;
     private EntityManager em;
-    private CategoryRepository repository;
     private DBCommandTransactionalExecutor executor; 
+    
+    private CategoryRepository repositoryUnderTest;
     
     @Before
     public void initTestCase() {
         emf = Persistence.createEntityManagerFactory("libraryPU");
         em = emf.createEntityManager();
         
-        repository = new CategoryRepository();
-        repository.em = em;
+        repositoryUnderTest = new CategoryRepository();
+        repositoryUnderTest.em = em;
         
         executor = new DBCommandTransactionalExecutor(em);
     }
@@ -48,55 +49,55 @@ public class CategoryRepositoryTest {
     public void addCategoryAndFindIt(){
         
         Long categoryAddedId = executor.executeCommand(() -> {
-            return repository.add(java()).getId();
+            return repositoryUnderTest.add(java()).getId();
         });
         
         assertThat(categoryAddedId, is(notNullValue()));
         
-        Category category = repository.findById(categoryAddedId);
+        Category category = repositoryUnderTest.findById(categoryAddedId);
         assertThat(category, is(notNullValue()));
         assertThat(category.getName(), is(equalTo(java().getName())));
     }
     
     @Test
     public void findCategoryByIdNotFound(){
-        Category cat = repository.findById(999L);
+        Category cat = repositoryUnderTest.findById(999L);
         assertThat(cat, is(nullValue()));
     }
     
     @Test
     public void findCategoryByIdWithNullId() {
-        Category category = repository.findById(null);
+        Category category = repositoryUnderTest.findById(null);
         assertThat(category, is(nullValue()));
     }
     
     @Test
     public void updateCategory(){
         Long categoryAddedId = executor.executeCommand(() -> {
-            return repository.add(java()).getId();
+            return repositoryUnderTest.add(java()).getId();
         });
         
-        Category categoryAfterAdd = repository.findById(categoryAddedId);
+        Category categoryAfterAdd = repositoryUnderTest.findById(categoryAddedId);
         assertThat(categoryAfterAdd.getName(), is(equalTo(java().getName())));
         
         categoryAfterAdd.setName(cleanCode().getName());
         executor.executeCommand(() -> {
-            repository.update(categoryAfterAdd);
+            repositoryUnderTest.update(categoryAfterAdd);
             return null;
         });
         
-        Category categoryAfterUpdate = repository.findById(categoryAddedId);
+        Category categoryAfterUpdate = repositoryUnderTest.findById(categoryAddedId);
         assertThat(categoryAfterUpdate.getName(), is(equalTo(cleanCode().getName())));
     }
     
     @Test
     public void findAllCategories(){
         executor.executeCommand(() -> {
-            allCategories().forEach(repository::add);
+            allCategories().forEach(repositoryUnderTest::add);
             return null;
         });
         
-        List<Category> categories = repository.findAll("name");
+        List<Category> categories = repositoryUnderTest.findAll("name");
         
         assertThat(categories.size(), is(equalTo(4)));
         assertThat(categories.get(0).getName(), is(equalTo(architecture().getName())));
@@ -108,39 +109,39 @@ public class CategoryRepositoryTest {
     @Test
     public void alreadyExistsForAdd(){
         executor.executeCommand(() -> {
-            repository.add(java());
+            repositoryUnderTest.add(java());
             return null;
         });
         assertThat("Existing element reported as non-existing.", 
-                repository.alreadyExists(java()), is(equalTo(true)));
+                repositoryUnderTest.alreadyExists(java()), is(equalTo(true)));
         assertThat("Non-existing element reported as existing.", 
-                repository.alreadyExists(cleanCode()), is(equalTo(false)));
+                repositoryUnderTest.alreadyExists(cleanCode()), is(equalTo(false)));
     }
     
     @Test
     public void alreadyExistsCategoryWithId(){
         Category java = executor.executeCommand(() -> {
-            repository.add(cleanCode());
-            return repository.add(java());
+            repositoryUnderTest.add(cleanCode());
+            return repositoryUnderTest.add(java());
         });
         
-        assertThat(repository.alreadyExists(java), is(equalTo(false)));
+        assertThat(repositoryUnderTest.alreadyExists(java), is(equalTo(false)));
         
         java.setName(cleanCode().getName());
-        assertThat(repository.alreadyExists(java), is(equalTo(true)));
+        assertThat(repositoryUnderTest.alreadyExists(java), is(equalTo(true)));
         
         java.setName(networks().getName());
-        assertThat(repository.alreadyExists(java), is(equalTo(false)));
+        assertThat(repositoryUnderTest.alreadyExists(java), is(equalTo(false)));
     }
     
     @Test
     public void existsById(){
         Long categoryAddedId = executor.executeCommand(() -> {
-            return repository.add(java()).getId();
+            return repositoryUnderTest.add(java()).getId();
         });
 
-        assertThat(repository.existsById(categoryAddedId), is(equalTo(true)));
-        assertThat(repository.existsById(999L), is(equalTo(false)));
+        assertThat(repositoryUnderTest.existsById(categoryAddedId), is(equalTo(true)));
+        assertThat(repositoryUnderTest.existsById(999L), is(equalTo(false)));
         
     }
 }
