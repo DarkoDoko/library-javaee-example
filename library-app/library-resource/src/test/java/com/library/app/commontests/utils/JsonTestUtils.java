@@ -25,6 +25,10 @@ public class JsonTestUtils {
         }
     }
     
+    public static void assertJsonMatchesFileContent(String actualJson, String fileNameWithExpectedJson){
+        assertJsonMatchesExpectedJson(actualJson, readJsonFile(fileNameWithExpectedJson));
+    }
+    
     public static void assertJsonMatchesExpectedJson(String actulaJson, String expectedJson) {
         try{
             JSONAssert.assertEquals(expectedJson, actulaJson, JSONCompareMode.NON_EXTENSIBLE);
