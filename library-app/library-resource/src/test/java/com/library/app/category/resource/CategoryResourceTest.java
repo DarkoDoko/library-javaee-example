@@ -23,6 +23,7 @@ import org.mockito.MockitoAnnotations;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 
 /**
  *
@@ -85,6 +86,8 @@ public class CategoryResourceTest {
         
         assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
         assertThat(response.getEntity().toString(), is(equalTo("")));
+        
+        verify(services).update(categoryWithId(java(), 1L));
     }
     
     @Test
