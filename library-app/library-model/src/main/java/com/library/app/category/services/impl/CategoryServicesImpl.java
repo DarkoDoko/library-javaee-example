@@ -54,9 +54,7 @@ public class CategoryServicesImpl implements CategoryServices{
 
     @Override
     public List<Category> findAll() {
-        List<Category> categories = repository.findAll("name");
-        
-        return categories;
+        return repository.findAll("name");
     }
     
     private void validateCategory(Category category) {
