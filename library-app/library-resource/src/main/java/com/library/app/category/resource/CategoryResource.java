@@ -1,6 +1,7 @@
 package com.library.app.category.resource;
 
 import com.library.app.category.exception.CategoryExistentException;
+import com.library.app.category.exception.CategoryNotFoundException;
 import com.library.app.category.model.Category;
 import com.library.app.category.services.CategoryServices;
 import com.library.app.common.exception.FieldNotValidException;
@@ -11,6 +12,7 @@ import com.library.app.common.model.OperationResult;
 import com.library.app.common.model.ResourceMessage;
 import static com.library.app.common.model.StandardsOperationResults.getOperationResultExistent;
 import static com.library.app.common.model.StandardsOperationResults.getOperationResultInvalidField;
+import static com.library.app.common.model.StandardsOperationResults.getOperationResultNotFound;
 import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +74,10 @@ public class CategoryResource {
             logger.error("One of the fields of the category is not valid", e);
             httpCode = HttpCode.VALIDATION_ERROR;
             result = getOperationResultInvalidField(RESOURCE_MESSAGE, e);
+        } catch(CategoryNotFoundException e){
+            logger.error("No category found for given id", e);
+            httpCode = HttpCode.NOT_FOUND;
+            result = getOperationResultNotFound(RESOURCE_MESSAGE);
         }
         
         logger.debug("Returning the operation result after updating category: {}", result);

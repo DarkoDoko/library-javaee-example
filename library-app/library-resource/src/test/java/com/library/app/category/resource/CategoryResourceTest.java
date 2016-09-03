@@ -1,6 +1,7 @@
 package com.library.app.category.resource;
 
 import com.library.app.category.exception.CategoryExistentException;
+import com.library.app.category.exception.CategoryNotFoundException;
 import com.library.app.category.model.Category;
 import com.library.app.category.services.CategoryServices;
 import com.library.app.common.exception.FieldNotValidException;
@@ -107,6 +108,17 @@ public class CategoryResourceTest {
         
         assertThat(response.getStatus(), is(equalTo(HttpCode.VALIDATION_ERROR.getCode())));
         assertJsonResponseWithFile(response, "categoryErrorNullName.json");
+    }
+    
+    @Test
+    public void updateCategoryNotFound(){
+        doThrow(new CategoryNotFoundException()).when(services).update(categoryWithId(java(), 2L));
+        
+        Response response = resourceUnderTest.update(2L, 
+                readJsonFile(getPathFileRequest(PATH_RESOURCE, "category.json")));
+        
+        assertThat(response.getStatus(), is(equalTo(HttpCode.NOT_FOUND.getCode())));
+        assertJsonResponseWithFile(response, "categoryNotFound.json");
     }
     
     private void assertJsonResponseWithFile(Response response, String fileName){
