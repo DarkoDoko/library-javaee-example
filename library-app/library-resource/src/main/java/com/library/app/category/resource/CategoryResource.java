@@ -58,12 +58,20 @@ public class CategoryResource {
         Category category = jsonConverter.convertFrom(body);
         category.setId(id);
         
-        services.update(category);
+        HttpCode httpCode = HttpCode.OK;
+        OperationResult result = null;
         
-        OperationResult result = OperationResult.success();
+        try{
+            services.update(category);
+            result = OperationResult.success();
+        } catch(CategoryExistentException e){
+            logger.error("There is already a category for the given name", e);
+            httpCode = HttpCode.VALIDATION_ERROR;
+            result = getOperationResultExistent(RESOURCE_MESSAGE, "name");
+        }
         
         logger.debug("Returning the operation result after updating category: {}", result);
         
-        return Response.status(HttpCode.OK.getCode()).entity(OperationResultJsonWriter.toJson(result)).build();
+        return Response.status(httpCode.getCode()).entity(OperationResultJsonWriter.toJson(result)).build();
     }
 }

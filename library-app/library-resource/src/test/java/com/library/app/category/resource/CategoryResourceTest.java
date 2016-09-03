@@ -21,6 +21,8 @@ import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import org.mockito.Mockito;
+import static org.mockito.Mockito.doThrow;
 
 /**
  *
@@ -81,6 +83,16 @@ public class CategoryResourceTest {
         
         assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
         assertThat(response.getEntity().toString(), is(equalTo("")));
+    }
+    
+    @Test
+    public void updateCategoryWithNameBelongingToOtherCategory(){
+        doThrow(new CategoryExistentException()).when(services).update(categoryWithId(java(), 1L));
+        
+        Response response = resourceUnderTest.update(1L, readJsonFile(getPathFileRequest(PATH_RESOURCE, "category.json")));
+        
+        assertThat(response.getStatus(), is(equalTo(HttpCode.VALIDATION_ERROR.getCode())));
+        assertJsonResponseWithFile(response, "categoryAlreadyExists.json");
     }
     
     private void assertJsonResponseWithFile(Response response, String fileName){
