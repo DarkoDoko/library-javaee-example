@@ -14,6 +14,7 @@ import static com.library.app.common.model.StandardsOperationResults.getOperatio
 import static com.library.app.common.model.StandardsOperationResults.getOperationResultInvalidField;
 import static com.library.app.common.model.StandardsOperationResults.getOperationResultNotFound;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,5 +84,20 @@ public class CategoryResource {
         logger.debug("Returning the operation result after updating category: {}", result);
         
         return Response.status(httpCode.getCode()).entity(OperationResultJsonWriter.toJson(result)).build();
+    }
+
+    Response findById(Long id) {
+        logger.debug("Find category: {}", id);
+        
+        ResponseBuilder responseBuilder;
+        
+        Category category = services.findById(id);
+        OperationResult result = OperationResult.success(jsonConverter.convertToJsonElement(category));
+        
+        responseBuilder = Response.status(HttpCode.OK.getCode()).entity(OperationResultJsonWriter.toJson(result));
+        
+        logger.debug("Category found: {}", category);
+        
+        return responseBuilder.build();
     }
 }
