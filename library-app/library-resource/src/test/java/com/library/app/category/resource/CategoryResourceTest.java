@@ -13,6 +13,7 @@ import static com.library.app.commontests.utils.FileTestNameUtils.getPathFileReq
 import static com.library.app.commontests.utils.JsonTestUtils.assertJsonMatchesExpectedJson;
 import static com.library.app.commontests.utils.JsonTestUtils.assertJsonMatchesFileContent;
 import static com.library.app.commontests.utils.JsonTestUtils.readJsonFile;
+import java.util.ArrayList;
 import javax.ws.rs.core.Response;
 import static org.hamcrest.CoreMatchers.equalTo;
 import org.junit.Test;
@@ -141,6 +142,16 @@ public class CategoryResourceTest {
         Response response = resourceUnderTest.findById(1L);
         
         assertThat(response.getStatus(), is(equalTo(HttpCode.NOT_FOUND.getCode())));
+    }
+    
+    @Test
+    public void findAllNoCategories(){
+        when(services.findAll()).thenReturn(new ArrayList<>());
+        
+        Response response = resourceUnderTest.findAll();
+        
+        assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
+        assertJsonResponseWithFile(response, "emptyListOfCategories.json");
     }
     
     private void assertJsonResponseWithFile(Response response, String fileName){

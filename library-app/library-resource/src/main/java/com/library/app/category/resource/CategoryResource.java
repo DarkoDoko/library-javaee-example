@@ -1,11 +1,14 @@
 package com.library.app.category.resource;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.library.app.category.exception.CategoryExistentException;
 import com.library.app.category.exception.CategoryNotFoundException;
 import com.library.app.category.model.Category;
 import com.library.app.category.services.CategoryServices;
 import com.library.app.common.exception.FieldNotValidException;
 import com.library.app.common.json.JsonUtils;
+import com.library.app.common.json.JsonWriter;
 import com.library.app.common.json.OperationResultJsonWriter;
 import com.library.app.common.model.HttpCode;
 import com.library.app.common.model.OperationResult;
@@ -13,6 +16,7 @@ import com.library.app.common.model.ResourceMessage;
 import static com.library.app.common.model.StandardsOperationResults.getOperationResultExistent;
 import static com.library.app.common.model.StandardsOperationResults.getOperationResultInvalidField;
 import static com.library.app.common.model.StandardsOperationResults.getOperationResultNotFound;
+import java.util.List;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import org.slf4j.Logger;
@@ -53,7 +57,10 @@ public class CategoryResource {
         }
                 
         logger.debug("Returning the opertaion result after adding category: {}", result);
-        return Response.status(httpCode.getCode()).entity(OperationResultJsonWriter.toJson(result)).build();
+        return Response
+                .status(httpCode.getCode())
+                .entity(OperationResultJsonWriter.toJson(result))
+                .build();
     }
 
     Response update(Long id, String body) {
@@ -83,7 +90,10 @@ public class CategoryResource {
         
         logger.debug("Returning the operation result after updating category: {}", result);
         
-        return Response.status(httpCode.getCode()).entity(OperationResultJsonWriter.toJson(result)).build();
+        return Response
+                .status(httpCode.getCode())
+                .entity(OperationResultJsonWriter.toJson(result))
+                .build();
     }
 
     Response findById(Long id) {
@@ -94,12 +104,41 @@ public class CategoryResource {
         try{
             Category category = services.findById(id);
             OperationResult result = OperationResult.success(jsonConverter.convertToJsonElement(category));
-            responseBuilder = Response.status(HttpCode.OK.getCode()).entity(OperationResultJsonWriter.toJson(result));
+            responseBuilder = Response
+                                .status(HttpCode.OK.getCode())
+                                .entity(OperationResultJsonWriter.toJson(result));
             logger.debug("Category found: {}", category);
         }  catch(CategoryNotFoundException e){
             logger.error("No category found for id", id);
             responseBuilder = Response.status(HttpCode.NOT_FOUND.getCode());
         }
         return responseBuilder.build();
+    }
+
+    Response findAll() {
+        logger.debug("Find all categories");
+        
+        List<Category> categories = services.findAll();
+        
+        logger.debug("Found {} categories", categories.size());
+        
+        JsonElement jsonWithPagingAndEntries = getJsonElementWithPagingAndEntries(categories);
+        
+        return Response
+                .status(HttpCode.OK.getCode())
+                .entity(JsonWriter.writeToString(jsonWithPagingAndEntries))
+                .build();
+    }
+
+    private JsonElement getJsonElementWithPagingAndEntries(List<Category> categories) {
+        JsonObject jsonWithEntriesAndPaging = new JsonObject();
+        JsonObject jsonPaging = new JsonObject();
+        
+        jsonPaging.addProperty("totalRecords", categories.size());
+        
+        jsonWithEntriesAndPaging.add("paging", jsonPaging);
+        jsonWithEntriesAndPaging.add("entries", jsonConverter.convertToJsonElement(categories));
+        
+        return jsonWithEntriesAndPaging;
     }
 }
