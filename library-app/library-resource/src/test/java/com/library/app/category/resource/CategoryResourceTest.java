@@ -75,6 +75,14 @@ public class CategoryResourceTest {
         assertJsonResponseWithFile(response, "categoryErrorNullName.json");
     }
     
+    @Test
+    public void updateValidCategory(){
+        Response response = resourceUnderTest.update(1L, readJsonFile(getPathFileRequest(PATH_RESOURCE, "category.json")));
+        
+        assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
+        assertThat(response.getEntity().toString(), is(equalTo("")));
+    }
+    
     private void assertJsonResponseWithFile(Response response, String fileName){
         assertJsonMatchesFileContent(response.getEntity().toString(), FileTestNameUtils.getPathFileResponse(PATH_RESOURCE, fileName));
     }

@@ -52,4 +52,18 @@ public class CategoryResource {
         logger.debug("Returning the opertaion result after adding category: {}", result);
         return Response.status(httpCode.getCode()).entity(OperationResultJsonWriter.toJson(result)).build();
     }
+
+    Response update(Long id, String body) {
+        logger.debug("Updating the category {} with body {}", id, body);
+        Category category = jsonConverter.convertFrom(body);
+        category.setId(id);
+        
+        services.update(category);
+        
+        OperationResult result = OperationResult.success();
+        
+        logger.debug("Returning the operation result after updating category: {}", result);
+        
+        return Response.status(HttpCode.OK.getCode()).entity(OperationResultJsonWriter.toJson(result)).build();
+    }
 }
