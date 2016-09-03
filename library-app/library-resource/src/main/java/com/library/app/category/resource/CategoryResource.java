@@ -68,6 +68,10 @@ public class CategoryResource {
             logger.error("There is already a category for the given name", e);
             httpCode = HttpCode.VALIDATION_ERROR;
             result = getOperationResultExistent(RESOURCE_MESSAGE, "name");
+        } catch(FieldNotValidException e){
+            logger.error("One of the fields of the category is not valid", e);
+            httpCode = HttpCode.VALIDATION_ERROR;
+            result = getOperationResultInvalidField(RESOURCE_MESSAGE, e);
         }
         
         logger.debug("Returning the operation result after updating category: {}", result);

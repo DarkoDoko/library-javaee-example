@@ -21,7 +21,6 @@ import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import org.mockito.Mockito;
 import static org.mockito.Mockito.doThrow;
 
 /**
@@ -71,7 +70,8 @@ public class CategoryResourceTest {
     public void addCategoryWithNullName() {
         when(services.add(new Category())).thenThrow(new FieldNotValidException("name", "may not be null"));
         
-        Response response = resourceUnderTest.add(readJsonFile(getPathFileRequest(PATH_RESOURCE, "categoryWithNullName.json")));
+        Response response = resourceUnderTest.add(
+                readJsonFile(getPathFileRequest(PATH_RESOURCE, "categoryWithNullName.json")));
         
         assertThat(response.getStatus(), is(equalTo(HttpCode.VALIDATION_ERROR.getCode())));
         assertJsonResponseWithFile(response, "categoryErrorNullName.json");
@@ -79,7 +79,8 @@ public class CategoryResourceTest {
     
     @Test
     public void updateValidCategory(){
-        Response response = resourceUnderTest.update(1L, readJsonFile(getPathFileRequest(PATH_RESOURCE, "category.json")));
+        Response response = resourceUnderTest.update(1L, 
+                readJsonFile(getPathFileRequest(PATH_RESOURCE, "category.json")));
         
         assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
         assertThat(response.getEntity().toString(), is(equalTo("")));
@@ -89,14 +90,29 @@ public class CategoryResourceTest {
     public void updateCategoryWithNameBelongingToOtherCategory(){
         doThrow(new CategoryExistentException()).when(services).update(categoryWithId(java(), 1L));
         
-        Response response = resourceUnderTest.update(1L, readJsonFile(getPathFileRequest(PATH_RESOURCE, "category.json")));
+        Response response = resourceUnderTest.update(1L, 
+                readJsonFile(getPathFileRequest(PATH_RESOURCE, "category.json")));
         
         assertThat(response.getStatus(), is(equalTo(HttpCode.VALIDATION_ERROR.getCode())));
         assertJsonResponseWithFile(response, "categoryAlreadyExists.json");
     }
     
+    @Test
+    public void updateCategoryWithNullName(){
+        doThrow(new FieldNotValidException("name", "may not be null")).
+                when(services).update(categoryWithId(new Category(), 1L));
+        
+        Response response = resourceUnderTest.update(1L, 
+                readJsonFile(getPathFileRequest(PATH_RESOURCE, "categoryWithNullName.json")));
+        
+        assertThat(response.getStatus(), is(equalTo(HttpCode.VALIDATION_ERROR.getCode())));
+        assertJsonResponseWithFile(response, "categoryErrorNullName.json");
+    }
+    
     private void assertJsonResponseWithFile(Response response, String fileName){
-        assertJsonMatchesFileContent(response.getEntity().toString(), FileTestNameUtils.getPathFileResponse(PATH_RESOURCE, fileName));
+        assertJsonMatchesFileContent(
+                response.getEntity().toString(), 
+                FileTestNameUtils.getPathFileResponse(PATH_RESOURCE, fileName));
     }
     
 }
