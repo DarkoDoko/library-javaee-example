@@ -134,6 +134,15 @@ public class CategoryResourceTest {
         assertJsonResponseWithFile(response, "categoryFound.json");
     }
     
+    @Test
+    public void findCategoryNotFound(){
+        when(services.findById(1L)).thenThrow(new CategoryNotFoundException());
+        
+        Response response = resourceUnderTest.findById(1L);
+        
+        assertThat(response.getStatus(), is(equalTo(HttpCode.NOT_FOUND.getCode())));
+    }
+    
     private void assertJsonResponseWithFile(Response response, String fileName){
         assertJsonMatchesFileContent(
                 response.getEntity().toString(), 

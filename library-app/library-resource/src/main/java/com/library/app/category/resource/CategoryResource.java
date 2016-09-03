@@ -91,13 +91,15 @@ public class CategoryResource {
         
         ResponseBuilder responseBuilder;
         
-        Category category = services.findById(id);
-        OperationResult result = OperationResult.success(jsonConverter.convertToJsonElement(category));
-        
-        responseBuilder = Response.status(HttpCode.OK.getCode()).entity(OperationResultJsonWriter.toJson(result));
-        
-        logger.debug("Category found: {}", category);
-        
+        try{
+            Category category = services.findById(id);
+            OperationResult result = OperationResult.success(jsonConverter.convertToJsonElement(category));
+            responseBuilder = Response.status(HttpCode.OK.getCode()).entity(OperationResultJsonWriter.toJson(result));
+            logger.debug("Category found: {}", category);
+        }  catch(CategoryNotFoundException e){
+            logger.error("No category found for id", id);
+            responseBuilder = Response.status(HttpCode.NOT_FOUND.getCode());
+        }
         return responseBuilder.build();
     }
 }
