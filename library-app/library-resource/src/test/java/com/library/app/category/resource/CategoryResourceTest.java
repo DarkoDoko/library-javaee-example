@@ -8,12 +8,14 @@ import com.library.app.common.exception.FieldNotValidException;
 import com.library.app.common.model.HttpCode;
 import static com.library.app.commontests.category.CategoryForTestsRepository.categoryWithId;
 import static com.library.app.commontests.category.CategoryForTestsRepository.java;
+import static com.library.app.commontests.category.CategoryForTestsRepository.networks;
 import com.library.app.commontests.utils.FileTestNameUtils;
 import static com.library.app.commontests.utils.FileTestNameUtils.getPathFileRequest;
 import static com.library.app.commontests.utils.JsonTestUtils.assertJsonMatchesExpectedJson;
 import static com.library.app.commontests.utils.JsonTestUtils.assertJsonMatchesFileContent;
 import static com.library.app.commontests.utils.JsonTestUtils.readJsonFile;
 import java.util.ArrayList;
+import java.util.Arrays;
 import javax.ws.rs.core.Response;
 import static org.hamcrest.CoreMatchers.equalTo;
 import org.junit.Test;
@@ -152,6 +154,18 @@ public class CategoryResourceTest {
         
         assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
         assertJsonResponseWithFile(response, "emptyListOfCategories.json");
+    }
+    
+    @Test
+    public void findAllTwoCategories(){
+        when(services.findAll()).thenReturn(
+                Arrays.asList(categoryWithId(java(), 1L), categoryWithId(networks(), 2L)));
+        
+        Response response = resourceUnderTest.findAll();
+        
+        assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
+        assertJsonResponseWithFile(response, "twoCategories.json");
+        
     }
     
     private void assertJsonResponseWithFile(Response response, String fileName){
