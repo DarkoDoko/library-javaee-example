@@ -3,12 +3,14 @@ package com.library.app.category.resource;
 import com.library.app.category.exception.CategoryExistentException;
 import com.library.app.category.model.Category;
 import com.library.app.category.services.CategoryServices;
+import com.library.app.common.exception.FieldNotValidException;
 import com.library.app.common.json.JsonUtils;
 import com.library.app.common.json.OperationResultJsonWriter;
 import com.library.app.common.model.HttpCode;
 import com.library.app.common.model.OperationResult;
 import com.library.app.common.model.ResourceMessage;
 import static com.library.app.common.model.StandardsOperationResults.getOperationResultExistent;
+import static com.library.app.common.model.StandardsOperationResults.getOperationResultInvalidField;
 import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +39,11 @@ public class CategoryResource {
         try{
             category = services.add(category);
             result = OperationResult.success(JsonUtils.getjsonElementWithId(category.getId()));
-        } catch(CategoryExistentException e){
+        } catch(FieldNotValidException e){
+            logger.error("Field not valid");
+            httpCode = HttpCode.VALIDATION_ERROR;
+            result = getOperationResultInvalidField(RESOURCE_MESSAGE, e);
+        }catch(CategoryExistentException e){
             logger.error("There's already a category for the given name.");
             httpCode = HttpCode.VALIDATION_ERROR;
             result = getOperationResultExistent(RESOURCE_MESSAGE, "name");
