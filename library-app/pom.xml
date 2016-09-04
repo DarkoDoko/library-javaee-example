@@ -72,6 +72,7 @@
     <modules>
         <module>library-model</module>
         <module>library-resource</module>
+        <module>library-integration-tests</module>
     </modules>
     <dependencyManagement>
         <dependencies>
