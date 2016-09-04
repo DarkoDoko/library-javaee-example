@@ -16,3 +16,4 @@ hs_err_pid*
 /library-app/target/
 /library-app/library-resource/nbproject/
 /library-app/library-resource/target/
+/library-app/library-integration-tests/target/
