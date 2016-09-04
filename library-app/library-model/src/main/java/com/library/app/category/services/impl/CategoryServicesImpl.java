@@ -9,17 +9,18 @@ import com.library.app.common.exception.FieldNotValidException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
-/**
- *
- * @author ddoko
- */
+@Stateless
 public class CategoryServicesImpl implements CategoryServices{
 
+    @Inject
     Validator validator;
     
+    @Inject
     CategoryRepository repository;
     
     @Override
