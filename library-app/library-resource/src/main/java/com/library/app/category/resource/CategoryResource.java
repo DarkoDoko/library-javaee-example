@@ -17,24 +17,36 @@ import static com.library.app.common.model.StandardsOperationResults.getOperatio
 import static com.library.app.common.model.StandardsOperationResults.getOperationResultInvalidField;
 import static com.library.app.common.model.StandardsOperationResults.getOperationResultNotFound;
 import java.util.List;
+import javax.inject.Inject;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- *
- * @author ddoko
- */
+@Path("/categories")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class CategoryResource {
     
     private Logger logger = LoggerFactory.getLogger(getClass());
     
     private static final ResourceMessage RESOURCE_MESSAGE = new ResourceMessage("category");
     
+    @Inject
     CategoryServices services;
+    
+    @Inject
     CategoryJsonConverter jsonConverter;
 
+    @POST
     public Response add(String body) {
         logger.debug("Adding a new category with body {}", body);
         
@@ -63,7 +75,9 @@ public class CategoryResource {
                 .build();
     }
 
-    Response update(Long id, String body) {
+    @PUT
+    @Path("/{id}")
+    Response update(@PathParam("id") Long id, String body) {
         logger.debug("Updating the category {} with body {}", id, body);
         Category category = jsonConverter.convertFrom(body);
         category.setId(id);
@@ -96,7 +110,9 @@ public class CategoryResource {
                 .build();
     }
 
-    Response findById(Long id) {
+    @GET
+    @Path("/{id}")
+    Response findById(@PathParam("id") Long id) {
         logger.debug("Find category: {}", id);
         
         ResponseBuilder responseBuilder;
@@ -115,6 +131,7 @@ public class CategoryResource {
         return responseBuilder.build();
     }
 
+    @GET
     Response findAll() {
         logger.debug("Find all categories");
         

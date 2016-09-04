@@ -6,11 +6,9 @@ import com.google.gson.JsonObject;
 import com.library.app.common.json.JsonReader;
 import com.library.app.category.model.Category;
 import java.util.List;
+import javax.enterprise.context.ApplicationScoped;
 
-/**
- *
- * @author ddoko
- */
+@ApplicationScoped
 public class CategoryJsonConverter {
     public Category convertFrom(String json){
         JsonObject jsonObject = JsonReader.readJsonObject(json);
