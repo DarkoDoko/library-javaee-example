@@ -38,11 +38,20 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.wildfly</groupId>
-            <artifactId>wildfly-dist</artifactId>
-            <version>10.1.0.Final</version>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
             <scope>test</scope>
-        </dependency>        
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-client</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.skyscreamer</groupId>
+            <artifactId>jsonassert</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     
     <profiles>
@@ -139,6 +148,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-resources-plugin</artifactId>
+                        <version>3.0.1</version>
                         <executions>
                             <execution>
                                 <id>copy-resources</id>
@@ -176,6 +186,8 @@
                         <groupId>org.jboss.arquillian</groupId>
                         <artifactId>arquillian-bom</artifactId>
                         <version>${version.arquillian.core}</version>
+                        <type>pom</type>
+                        <scope>import</scope>
                     </dependency>
                 </dependencies>
             </dependencyManagement>
@@ -183,6 +195,7 @@
                 <dependency>
                     <groupId>org.jboss.arquillian.core</groupId>
                     <artifactId>arquillian-core-api</artifactId>
+                    <version>${version.arquillian.core}</version>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
@@ -194,11 +207,13 @@
                 <dependency>
                     <groupId>org.jboss.arquillian.junit</groupId>
                     <artifactId>arquillian-junit-container</artifactId>
+                    <version>1.1.11.Final</version>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.jboss.shrinkwrap.resolver</groupId>
                     <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
+                    <version>2.2.2</version>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
