@@ -13,11 +13,11 @@ import com.library.app.common.exception.InvalidJsonException;
  */
 public class JsonReader {
     
-    public static JsonObject readJsonObject(String json) {
+    public static JsonObject readAsJsonObject(String json) {
         return readJsonAs(json, JsonObject.class);
     }
     
-    public static JsonArray readJsonArray(String json){
+    public static JsonArray readAsJsonArray(String json){
         return readJsonAs(json, JsonArray.class);
     }
     

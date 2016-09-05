@@ -11,7 +11,7 @@ import javax.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class CategoryJsonConverter {
     public Category convertFrom(String json){
-        JsonObject jsonObject = JsonReader.readJsonObject(json);
+        JsonObject jsonObject = JsonReader.readAsJsonObject(json);
         Category category = new Category();
         category.setName(JsonReader.getStringOrNull(jsonObject, "name"));
         
