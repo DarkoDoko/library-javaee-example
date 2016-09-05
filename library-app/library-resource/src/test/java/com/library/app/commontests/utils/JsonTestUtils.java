@@ -1,5 +1,7 @@
 package com.library.app.commontests.utils;
 
+import com.google.gson.JsonObject;
+import com.library.app.common.json.JsonReader;
 import java.io.InputStream;
 import java.util.Scanner;
 import org.json.JSONException;
@@ -35,5 +37,10 @@ public class JsonTestUtils {
         } catch(JSONException e){
             throw new IllegalArgumentException(e);
         }
+    }
+    
+    public static Long getIdFromJson(String json){
+        JsonObject jsonObject = JsonReader.readAsJsonObject(json);
+        return JsonReader.getLongOrNull(jsonObject, "id");
     }
 }
