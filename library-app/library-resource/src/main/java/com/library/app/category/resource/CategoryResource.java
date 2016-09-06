@@ -83,7 +83,7 @@ public class CategoryResource {
         category.setId(id);
         
         HttpCode httpCode = HttpCode.OK;
-        OperationResult result = null;
+        OperationResult result;
         
         try{
             services.update(category);
