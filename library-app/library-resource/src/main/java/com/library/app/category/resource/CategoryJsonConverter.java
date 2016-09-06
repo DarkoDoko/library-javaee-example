@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import com.library.app.common.json.JsonReader;
 import com.library.app.category.model.Category;
 import java.util.List;
-import java.util.function.Consumer;
 import javax.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
