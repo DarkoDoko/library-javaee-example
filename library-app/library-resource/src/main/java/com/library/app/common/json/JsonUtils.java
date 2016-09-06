@@ -12,7 +12,7 @@ public class JsonUtils {
     private JsonUtils(){
     }
     
-    public static JsonElement getjsonElementWithId(Long id){
+    public static JsonElement getJsonElementWithId(Long id){
         JsonObject idJson = new JsonObject();
         idJson.addProperty("id", id);
         

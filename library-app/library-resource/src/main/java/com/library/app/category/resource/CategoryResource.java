@@ -57,7 +57,7 @@ public class CategoryResource {
         
         try{
             category = services.add(category);
-            result = OperationResult.success(JsonUtils.getjsonElementWithId(category.getId()));
+            result = OperationResult.success(JsonUtils.getJsonElementWithId(category.getId()));
         } catch(FieldNotValidException e){
             logger.error("Field not valid");
             httpCode = HttpCode.VALIDATION_ERROR;
