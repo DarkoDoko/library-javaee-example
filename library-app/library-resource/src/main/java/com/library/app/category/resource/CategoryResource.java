@@ -77,7 +77,7 @@ public class CategoryResource {
 
     @PUT
     @Path("/{id}")
-    Response update(@PathParam("id") Long id, String body) {
+    public Response update(@PathParam("id") Long id, String body) {
         logger.debug("Updating the category {} with body {}", id, body);
         Category category = jsonConverter.convertFrom(body);
         category.setId(id);
@@ -112,7 +112,7 @@ public class CategoryResource {
 
     @GET
     @Path("/{id}")
-    Response findById(@PathParam("id") Long id) {
+    public Response findById(@PathParam("id") Long id) {
         logger.debug("Find category: {}", id);
         
         ResponseBuilder responseBuilder;
@@ -132,7 +132,7 @@ public class CategoryResource {
     }
 
     @GET
-    Response findAll() {
+    public Response findAll() {
         logger.debug("Find all categories");
         
         List<Category> categories = services.findAll();
