@@ -53,7 +53,7 @@ public class CategoryResource {
         Category category = jsonConverter.convertFrom(body);
         
         HttpCode httpCode = HttpCode.CREATED;
-        OperationResult result = null;
+        OperationResult result;
         
         try{
             category = services.add(category);
