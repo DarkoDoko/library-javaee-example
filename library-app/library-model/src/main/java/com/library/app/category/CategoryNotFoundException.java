@@ -1,4 +1,4 @@
-package com.library.app.category.exception;
+package com.library.app.category;
 
 /**
  *

@@ -1,11 +1,11 @@
 package com.library.app.category.services.impl;
 
-import com.library.app.category.exception.CategoryExistentException;
-import com.library.app.category.exception.CategoryNotFoundException;
+import com.library.app.category.CategoryExistentException;
+import com.library.app.category.CategoryNotFoundException;
 import com.library.app.category.model.Category;
 import com.library.app.category.repository.CategoryRepository;
 import com.library.app.category.services.CategoryServices;
-import com.library.app.common.exception.FieldNotValidException;
+import com.library.app.FieldNotValidException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;

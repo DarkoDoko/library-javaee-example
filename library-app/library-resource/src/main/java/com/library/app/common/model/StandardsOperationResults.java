@@ -1,6 +1,6 @@
 package com.library.app.common.model;
 
-import com.library.app.common.exception.FieldNotValidException;
+import com.library.app.FieldNotValidException;
 
 /**
  *

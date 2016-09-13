@@ -2,11 +2,11 @@ package com.library.app.category.resource;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.library.app.category.exception.CategoryExistentException;
-import com.library.app.category.exception.CategoryNotFoundException;
+import com.library.app.category.CategoryExistentException;
+import com.library.app.category.CategoryNotFoundException;
 import com.library.app.category.model.Category;
 import com.library.app.category.services.CategoryServices;
-import com.library.app.common.exception.FieldNotValidException;
+import com.library.app.FieldNotValidException;
 import com.library.app.common.json.JsonUtils;
 import com.library.app.common.json.JsonWriter;
 import com.library.app.common.json.OperationResultJsonWriter;
