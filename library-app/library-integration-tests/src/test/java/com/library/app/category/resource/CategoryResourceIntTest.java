@@ -1,15 +1,20 @@
 package com.library.app.category.resource;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.library.app.category.model.Category;
 import com.library.app.json.JsonReader;
 import com.library.app.common.model.HttpCode;
+import static com.library.app.commontests.category.CategoryForTestsRepository.architecture;
 import static com.library.app.commontests.category.CategoryForTestsRepository.cleanCode;
 import static com.library.app.commontests.category.CategoryForTestsRepository.java;
+import static com.library.app.commontests.category.CategoryForTestsRepository.networks;
 import static com.library.app.commontests.utils.FileTestNameUtils.getPathFileRequest;
+import static com.library.app.commontests.utils.FileTestNameUtils.getPathFileResponse;
+import com.library.app.commontests.utils.IntTestUtils;
 import static com.library.app.commontests.utils.IntTestUtils.addElementWithFileAndGetId;
-import static com.library.app.commontests.utils.IntTestUtils.findById;
-import com.library.app.commontests.utils.JsonTestUtils;
+import static com.library.app.commontests.utils.JsonTestUtils.assertJsonMatchesFileContent;
 import com.library.app.commontests.utils.ResourceClient;
 import com.library.app.commontests.utils.ResourceDefinitions;
 import java.io.File;
@@ -55,25 +60,15 @@ public class CategoryResourceIntTest {
     
     @Before
     public void initTestCase(){
-        this.resourceClient = new ResourceClient(url);
+        resourceClient = new ResourceClient(url);
+        resourceClient.resourcePath("/DB").delete();
     }
     
     @Test
     @RunAsClient
-    public void addValidCategoryAndFindIt(){
-        Response response = resourceClient.resourcePath(PATH_RESOURCE)
-                                .postWithFile(getPathFileRequest(PATH_RESOURCE, "category.json"));
-        
-        assertThat(response.getStatus(), is(equalTo(HttpCode.CREATED.getCode())));
-        
-        Long id = JsonTestUtils.getIdFromJson(response.readEntity(String.class));
-        
-        Response responseGet = resourceClient.resourcePath(PATH_RESOURCE + "/" + id).get();
-        assertThat(responseGet.getStatus(), is(equalTo(HttpCode.OK.getCode())));
-        
-        JsonObject category = JsonReader.readAsJsonObject(responseGet.readEntity(String.class));
-        assertThat(JsonReader.getStringOrNull(category, "name"), is(equalTo(java().getName())));
-        
+    public void addValidCategoryAndFindIt(){        
+        Long id = addCategoryAndGetId("category.json");
+        findCategoryAndAssertResponseWithCategory(id, java());
     }
     
     @Test
@@ -86,7 +81,7 @@ public class CategoryResourceIntTest {
         
         assertThat(response.getStatus(), is(equalTo(HttpCode.VALIDATION_ERROR.getCode())));
         
-        //assertJsonResponseWithFile(response, "categoryErrorNullName.json");
+        assertJsonResponseWithFile(response, "categoryErrorNullName.json");
     }
     
     @Test
@@ -103,7 +98,7 @@ public class CategoryResourceIntTest {
         
         assertThat(response.getStatus(), is(equalTo(HttpCode.VALIDATION_ERROR.getCode())));
         
-        //assertJsonResponseWithFile(response, "categoryAlreadyExists.json");
+        assertJsonResponseWithFile(response, "categoryAlreadyExists.json");
     }
     
     @Test
@@ -146,16 +141,43 @@ public class CategoryResourceIntTest {
         assertThat(response.getStatus(), is(equalTo(HttpCode.NOT_FOUND.getCode())));
     }
     
+    @Test
+    @RunAsClient
+    public void findAllCategories() {
+        resourceClient.resourcePath("DB/" + PATH_RESOURCE).postWithContent("");
+
+        Response response = resourceClient.resourcePath(PATH_RESOURCE).get();
+        assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
+        assertResponseContainsTheCategories(response, 4, architecture(), cleanCode(), java(), networks());
+    }
+    
+    private void assertResponseContainsTheCategories(Response response, int expectedTotalRecords, Category... expectedCategories){
+        JsonObject result = JsonReader.readAsJsonObject(response.readEntity(String.class));
+        
+        int totalRecords = result.getAsJsonObject("paging").get("totalRecords").getAsInt();
+        assertThat(totalRecords, is(equalTo(expectedTotalRecords)));
+        
+        JsonArray categoriesList = result.getAsJsonArray("entries");
+        assertThat(categoriesList.size(), is(equalTo(expectedCategories.length)));
+        
+        for(int i = 0; i < expectedCategories.length; i++){
+            Category expectedCategory = expectedCategories[i];
+            assertThat(
+                    categoriesList.get(i).getAsJsonObject().get("name").getAsString(),
+                    is(equalTo(expectedCategory.getName())));
+        }
+    }
+    
     private Long addCategoryAndGetId(final String fileName) {
         return addElementWithFileAndGetId(resourceClient, PATH_RESOURCE, PATH_RESOURCE, fileName);
     }
 
     private void assertJsonResponseWithFile(final Response response, final String fileName) {
-        //assertJsonMatchesFileContent(response.readEntity(String.class), getPathFileResponse(PATH_RESOURCE, fileName));
+        assertJsonMatchesFileContent(response.readEntity(String.class), getPathFileResponse(PATH_RESOURCE, fileName));
     }
 
     private void findCategoryAndAssertResponseWithCategory(Long categoryIdToBeFound, Category expectedCategory) {
-        String json = findById(resourceClient, PATH_RESOURCE, categoryIdToBeFound);
+        String json = IntTestUtils.findById(resourceClient, PATH_RESOURCE, categoryIdToBeFound);
 	JsonObject categoryAsJson = JsonReader.readAsJsonObject(json);
         assertThat(JsonReader.getStringOrNull(categoryAsJson, "name"), is(equalTo(expectedCategory.getName())));
     }
