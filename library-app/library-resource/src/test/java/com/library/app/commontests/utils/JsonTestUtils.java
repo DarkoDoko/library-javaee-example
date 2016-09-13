@@ -1,7 +1,7 @@
 package com.library.app.commontests.utils;
 
 import com.google.gson.JsonObject;
-import com.library.app.common.json.JsonReader;
+import com.library.app.json.JsonReader;
 import java.io.InputStream;
 import java.util.Scanner;
 import org.json.JSONException;

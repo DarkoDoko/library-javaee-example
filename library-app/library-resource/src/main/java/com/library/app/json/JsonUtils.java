@@ -1,4 +1,4 @@
-package com.library.app.common.json;
+package com.library.app.json;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
