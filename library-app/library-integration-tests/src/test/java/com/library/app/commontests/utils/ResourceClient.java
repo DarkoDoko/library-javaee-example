@@ -32,6 +32,14 @@ public class ResourceClient {
 	public Response postWithContent(final String content) {
 		return buildClient().post(Entity.entity(content, MediaType.APPLICATION_JSON));
 	}
+        
+        public Response putWithFile(final String fileName) {
+		return putWithContent(getRequestFromFileOrEmptyIfNullFile(fileName));
+	}
+
+	public Response putWithContent(final String content) {
+		return buildClient().put(Entity.entity(content, MediaType.APPLICATION_JSON));
+	}
 
 	public Response get() {
 		return buildClient().get();
@@ -44,9 +52,9 @@ public class ResourceClient {
 
 	private String getFullURL(final String resourcePath) {
 		try {
-			return this.urlBase.toURI() + "api/" + resourcePath;
+                    return this.urlBase.toURI() + "api/" + resourcePath;
 		} catch (final URISyntaxException e) {
-			throw new IllegalArgumentException(e);
+                    throw new IllegalArgumentException(e);
 		}
 	}
 

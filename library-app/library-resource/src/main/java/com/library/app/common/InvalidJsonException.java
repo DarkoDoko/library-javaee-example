@@ -1,4 +1,4 @@
-package com.library.app.common.exception;
+package com.library.app.common;
 
 /**
  *
