@@ -41,8 +41,8 @@ public class ResourceClient {
 		return buildClient().put(Entity.entity(content, MediaType.APPLICATION_JSON));
 	}
         
-        public Response delete() {
-		return buildClient().delete();
+        public void delete() {
+            buildClient().delete();
 	}
 
 	public Response get() {
