@@ -7,7 +7,6 @@ import com.library.app.common.model.HttpCode;
 import static com.library.app.commontests.category.CategoryForTestsRepository.cleanCode;
 import static com.library.app.commontests.category.CategoryForTestsRepository.java;
 import static com.library.app.commontests.utils.FileTestNameUtils.getPathFileRequest;
-import static com.library.app.commontests.utils.FileTestNameUtils.getPathFileResponse;
 import static com.library.app.commontests.utils.IntTestUtils.addElementWithFileAndGetId;
 import static com.library.app.commontests.utils.IntTestUtils.findById;
 import com.library.app.commontests.utils.JsonTestUtils;

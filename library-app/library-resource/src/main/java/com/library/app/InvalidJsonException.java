@@ -1,4 +1,4 @@
-package com.library.app.common;
+package com.library.app;
 
 /**
  *
