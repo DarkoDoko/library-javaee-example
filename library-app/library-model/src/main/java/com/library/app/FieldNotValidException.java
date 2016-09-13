@@ -1,9 +1,8 @@
 package com.library.app;
 
-/**
- *
- * @author ddoko
- */
+import javax.ejb.ApplicationException;
+
+@ApplicationException
 public class FieldNotValidException extends RuntimeException{
     private static final long serialVersionUID = 4525821332583716666L;
     
