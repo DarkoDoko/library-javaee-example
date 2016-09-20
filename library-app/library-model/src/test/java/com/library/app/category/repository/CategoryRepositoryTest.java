@@ -1,11 +1,11 @@
 package com.library.app.category.repository;
 
 import com.library.app.category.model.Category;
-import static com.library.app.commontests.category.CategoryForTestsRepository.allCategories;
-import static com.library.app.commontests.category.CategoryForTestsRepository.architecture;
-import static com.library.app.commontests.category.CategoryForTestsRepository.cleanCode;
-import static com.library.app.commontests.category.CategoryForTestsRepository.java;
-import static com.library.app.commontests.category.CategoryForTestsRepository.networks;
+import static com.library.app.category.CategoryForTestsRepository.allCategories;
+import static com.library.app.category.CategoryForTestsRepository.architecture;
+import static com.library.app.category.CategoryForTestsRepository.cleanCode;
+import static com.library.app.category.CategoryForTestsRepository.java;
+import static com.library.app.category.CategoryForTestsRepository.networks;
 import com.library.app.commontests.utils.DBCommandTransactionalExecutor;
 import java.util.List;
 import javax.persistence.EntityManager;

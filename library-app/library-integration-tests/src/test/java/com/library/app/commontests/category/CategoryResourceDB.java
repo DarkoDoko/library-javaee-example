@@ -1,5 +1,6 @@
 package com.library.app.commontests.category;
 
+import com.library.app.category.CategoryForTestsRepository;
 import com.library.app.category.services.CategoryServices;
 import javax.inject.Inject;
 import javax.ws.rs.POST;

@@ -1,4 +1,4 @@
-package com.library.app.commontests.category;
+package com.library.app.category;
 
 import com.library.app.category.model.Category;
 import java.util.Arrays;
