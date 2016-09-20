@@ -1,4 +1,4 @@
-package com.library.app.commontests.utils;
+package com.library.app.category.resource;
 
 import org.junit.Ignore;
 

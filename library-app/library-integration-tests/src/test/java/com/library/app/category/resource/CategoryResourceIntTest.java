@@ -16,7 +16,6 @@ import com.library.app.commontests.utils.IntTestUtils;
 import static com.library.app.commontests.utils.IntTestUtils.addElementWithFileAndGetId;
 import static com.library.app.commontests.utils.JsonTestUtils.assertJsonMatchesFileContent;
 import com.library.app.commontests.utils.ResourceClient;
-import com.library.app.commontests.utils.ResourceDefinitions;
 import java.io.File;
 import java.net.URL;
 import javax.ws.rs.core.Response;
