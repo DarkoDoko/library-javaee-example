@@ -2,6 +2,7 @@ package com.library.app.author.model;
 
 import java.io.Serializable;
 import java.util.Objects;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -21,6 +22,7 @@ public class Author implements Serializable{
     
     @NotNull
     @Size(min = 2, max = 40)
+    @Column
     private String name;
 
     public Author() {
