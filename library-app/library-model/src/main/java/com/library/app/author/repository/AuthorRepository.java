@@ -11,17 +11,28 @@ public class AuthorRepository {
     @PersistenceContext
     EntityManager em;
 
-    Author add(Author author) {
+    public Author add(Author author) {
         em.persist(author);
         return author;
     }
 
-    Author findById(Long id) {
+    public Author findById(Long id) {
         if(id == null){
             return null;
         }
         
         return em.find(Author.class, id);
+    }
+
+    public void update(Author author) {
+        em.merge(author);
+    }
+    
+    public boolean existsById(Long id){
+        return em.createQuery("SELECT 1 FROM Author e where e.id = :id")
+                .setParameter("id", id)
+                .setMaxResults(1)
+                .getResultList().size() > 0;
     }
     
 }

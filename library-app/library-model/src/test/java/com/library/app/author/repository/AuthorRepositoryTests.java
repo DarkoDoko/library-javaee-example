@@ -7,6 +7,7 @@ import com.library.app.commontests.utils.DBCommandTransactionalExecutor;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import org.hamcrest.CoreMatchers;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -54,4 +55,43 @@ public class AuthorRepositoryTests {
         assertThat(author.getName(), is(equalTo(robertMartin().getName())));
     }
     
+    @Test
+    public void findAuthorByIdNotFound(){
+        Author author = repositoryUnderTest.findById(999L);
+        
+        assertThat(author, is(CoreMatchers.nullValue()));
+        
+    }
+    
+    @Test
+    public void updateAuthor(){
+        Long authorAddedId = dbExecutor.executeCommand(() -> {
+            return repositoryUnderTest.add(robertMartin()).getId();
+        });
+        assertThat(authorAddedId, is(notNullValue()));
+        
+        Author author = repositoryUnderTest.findById(authorAddedId);
+        assertThat(author, is(notNullValue()));
+        assertThat(author.getName(), is(equalTo(robertMartin().getName())));
+        
+        author.setName("Uncle Bob");
+        dbExecutor.executeCommand(() -> {
+            repositoryUnderTest.update(author);
+            return null;
+        });
+        
+        Author authorAfterUpdate = repositoryUnderTest.findById(authorAddedId);
+        assertThat(authorAfterUpdate, is(notNullValue()));
+        assertThat(authorAfterUpdate.getName(), is(equalTo("Uncle Bob")));
+    }
+    
+    @Test
+    public void existsById(){
+        Long authorAddedId = dbExecutor.executeCommand(() -> {
+            return repositoryUnderTest.add(robertMartin()).getId();
+        });
+        
+        assertThat(repositoryUnderTest.existsById(authorAddedId), is(equalTo(true)));
+        assertThat(repositoryUnderTest.existsById(999L), is(equalTo(false)));
+    }
 }
