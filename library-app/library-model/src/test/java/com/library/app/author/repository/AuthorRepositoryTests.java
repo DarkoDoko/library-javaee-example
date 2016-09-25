@@ -1,8 +1,14 @@
 package com.library.app.author.repository;
 
-import com.library.app.author.AuthorForTestsRepository;
+import static com.library.app.author.AuthorForTestsRepository.erichGamma;
+import static com.library.app.author.AuthorForTestsRepository.jamesGosling;
+import static com.library.app.author.AuthorForTestsRepository.martinFowler;
 import static com.library.app.author.AuthorForTestsRepository.robertMartin;
 import com.library.app.author.model.Author;
+import com.library.app.author.model.AuthorFilter;
+import com.library.app.common.model.PaginatedData;
+import com.library.app.common.model.filter.PaginationData;
+import com.library.app.common.model.filter.PaginationData.OrderMode;
 import com.library.app.commontests.utils.DBCommandTransactionalExecutor;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -11,8 +17,8 @@ import org.hamcrest.CoreMatchers;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import org.junit.After;
-import org.junit.Assert;
 import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,8 +65,7 @@ public class AuthorRepositoryTests {
     public void findAuthorByIdNotFound(){
         Author author = repositoryUnderTest.findById(999L);
         
-        assertThat(author, is(CoreMatchers.nullValue()));
-        
+        assertThat(author, is(nullValue()));
     }
     
     @Test
@@ -94,4 +99,54 @@ public class AuthorRepositoryTests {
         assertThat(repositoryUnderTest.existsById(authorAddedId), is(equalTo(true)));
         assertThat(repositoryUnderTest.existsById(999L), is(equalTo(false)));
     }
+    
+    @Test
+    public void findByFilterNoFilter(){
+        loadDataForFindByFilter();
+        
+        PaginatedData<Author> result = repositoryUnderTest.findByFilter(new AuthorFilter());
+        
+        assertThat(result.getNumberOfRows(), is(equalTo(4)));
+        assertThat(result.getRows().size(), is(equalTo(4)));
+        
+        assertThat(result.getRow(0).getName(), is(equalTo(erichGamma().getName())));
+        assertThat(result.getRow(1).getName(), is(equalTo(jamesGosling().getName())));
+        assertThat(result.getRow(2).getName(), is(equalTo(martinFowler().getName())));
+        assertThat(result.getRow(3).getName(), is(equalTo(robertMartin().getName())));
+    }
+    
+    @Test
+    public void findByFilterFilteringNameAndOrderingDescending() {
+        loadDataForFindByFilter();
+
+        final AuthorFilter authorFilter = new AuthorFilter();
+        authorFilter.setName("o");
+        authorFilter.setPaginationData(new PaginationData(0, 2, "name", OrderMode.DESCENDING));
+
+        PaginatedData<Author> result = repositoryUnderTest.findByFilter(authorFilter);
+        
+        assertThat(result.getNumberOfRows(), is(equalTo(3)));
+        assertThat(result.getRows().size(), is(equalTo(2)));
+        
+        assertThat(result.getRow(0).getName(), is(equalTo(robertMartin().getName())));
+        assertThat(result.getRow(1).getName(), is(equalTo(martinFowler().getName())));
+
+        authorFilter.setPaginationData(new PaginationData(2, 2, "name", OrderMode.DESCENDING));
+        result = repositoryUnderTest.findByFilter(authorFilter);
+
+        assertThat(result.getNumberOfRows(), is(equalTo(3)));
+        assertThat(result.getRows().size(), is(equalTo(1)));
+        assertThat(result.getRow(0).getName(), is(equalTo(jamesGosling().getName())));
+    }
+
+    private void loadDataForFindByFilter() {
+        dbExecutor.executeCommand(() -> {
+            repositoryUnderTest.add(robertMartin());
+            repositoryUnderTest.add(jamesGosling());
+            repositoryUnderTest.add(martinFowler());
+            repositoryUnderTest.add(erichGamma());            
+            return null;
+        });
+    }
+    
 }
