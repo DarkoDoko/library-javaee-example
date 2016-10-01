@@ -7,6 +7,7 @@ import static com.library.app.category.CategoryForTestsRepository.cleanCode;
 import static com.library.app.category.CategoryForTestsRepository.java;
 import static com.library.app.category.CategoryForTestsRepository.networks;
 import com.library.app.commontests.utils.DBCommandTransactionalExecutor;
+import com.library.app.commontests.utils.TestBaseRepository;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -20,35 +21,27 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
-public class CategoryRepositoryTest {
-    
-    private EntityManagerFactory emf;
-    private EntityManager em;
-    private DBCommandTransactionalExecutor executor; 
-    
+public class CategoryRepositoryTest extends TestBaseRepository {
+        
     private CategoryRepository repositoryUnderTest;
     
     @Before
     public void initTestCase() {
-        emf = Persistence.createEntityManagerFactory("libraryPU");
-        em = emf.createEntityManager();
-        
+        initializeTestDB();
+
         repositoryUnderTest = new CategoryRepository();
-        repositoryUnderTest.em = em;
-        
-        executor = new DBCommandTransactionalExecutor(em);
+        repositoryUnderTest.em = em;    
     }
     
     @After
-    public void closeEM(){
-        em.close();
-        emf.close();
+    public void setDownTestCase(){
+        closeEntityManager();
     }
     
     @Test
     public void addCategoryAndFindIt(){
         
-        Long categoryAddedId = executor.executeCommand(() -> {
+        Long categoryAddedId = dbExecutor.executeCommand(() -> {
             return repositoryUnderTest.add(java()).getId();
         });
         
@@ -73,7 +66,7 @@ public class CategoryRepositoryTest {
     
     @Test
     public void updateCategory(){
-        Long categoryAddedId = executor.executeCommand(() -> {
+        Long categoryAddedId = dbExecutor.executeCommand(() -> {
             return repositoryUnderTest.add(java()).getId();
         });
         
@@ -81,7 +74,7 @@ public class CategoryRepositoryTest {
         assertThat(categoryAfterAdd.getName(), is(equalTo(java().getName())));
         
         categoryAfterAdd.setName(cleanCode().getName());
-        executor.executeCommand(() -> {
+        dbExecutor.executeCommand(() -> {
             repositoryUnderTest.update(categoryAfterAdd);
             return null;
         });
@@ -92,7 +85,7 @@ public class CategoryRepositoryTest {
     
     @Test
     public void findAllCategories(){
-        executor.executeCommand(() -> {
+        dbExecutor.executeCommand(() -> {
             allCategories().forEach(repositoryUnderTest::add);
             return null;
         });
@@ -108,7 +101,7 @@ public class CategoryRepositoryTest {
     
     @Test
     public void alreadyExistsForAdd(){
-        executor.executeCommand(() -> {
+        dbExecutor.executeCommand(() -> {
             repositoryUnderTest.add(java());
             return null;
         });
@@ -120,7 +113,7 @@ public class CategoryRepositoryTest {
     
     @Test
     public void alreadyExistsCategoryWithId(){
-        Category java = executor.executeCommand(() -> {
+        Category java = dbExecutor.executeCommand(() -> {
             repositoryUnderTest.add(cleanCode());
             return repositoryUnderTest.add(java());
         });
@@ -136,7 +129,7 @@ public class CategoryRepositoryTest {
     
     @Test
     public void existsById(){
-        Long categoryAddedId = executor.executeCommand(() -> {
+        Long categoryAddedId = dbExecutor.executeCommand(() -> {
             return repositoryUnderTest.add(java()).getId();
         });
 
