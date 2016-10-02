@@ -1,4 +1,4 @@
-package com.library.app.common.model;
+package com.library.app.pagination;
 
 import java.util.List;
 

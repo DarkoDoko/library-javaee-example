@@ -1,4 +1,4 @@
-package com.library.app.common.model.filter;
+package com.library.app.pagination.filter;
 
 public class GenericFilter {
     

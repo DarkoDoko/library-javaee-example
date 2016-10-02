@@ -3,7 +3,7 @@ package com.library.app.author.repository;
 import com.library.app.GenericRepository;
 import com.library.app.author.model.Author;
 import com.library.app.author.model.AuthorFilter;
-import com.library.app.common.model.PaginatedData;
+import com.library.app.pagination.PaginatedData;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
