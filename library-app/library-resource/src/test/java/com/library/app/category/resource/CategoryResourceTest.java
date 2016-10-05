@@ -28,10 +28,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
-/**
- *
- * @author ddoko
- */
 public class CategoryResourceTest {
     
     private CategoryResource resourceUnderTest;

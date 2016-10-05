@@ -2,10 +2,6 @@ package com.library.app.common.model;
 
 import com.library.app.FieldNotValidException;
 
-/**
- *
- * @author ddoko
- */
 public class StandardsOperationResults {
 
     private StandardsOperationResults() {

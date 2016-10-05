@@ -2,10 +2,6 @@ package com.library.app.commontests.utils;
 
 import org.junit.Ignore;
 
-/**
- *
- * @author ddoko
- */
 @Ignore
 public class FileTestNameUtils {
     private static final String PATH_REQUEST = "/request/";

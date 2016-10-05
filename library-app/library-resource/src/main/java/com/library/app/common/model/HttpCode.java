@@ -1,9 +1,5 @@
 package com.library.app.common.model;
 
-/**
- *
- * @author ddoko
- */
 public enum HttpCode {
     CREATED(201),
     VALIDATION_ERROR(422),

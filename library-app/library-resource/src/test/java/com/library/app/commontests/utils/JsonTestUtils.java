@@ -9,10 +9,6 @@ import org.junit.Ignore;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-/**
- *
- * @author ddoko
- */
 @Ignore
 public class JsonTestUtils {
     

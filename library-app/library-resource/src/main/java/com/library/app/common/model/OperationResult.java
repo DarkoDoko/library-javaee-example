@@ -1,9 +1,5 @@
 package com.library.app.common.model;
 
-/**
- *
- * @author ddoko
- */
 public class OperationResult {
     
     private boolean success;
@@ -55,8 +51,4 @@ public class OperationResult {
     public String toString() {
         return "OperationResult{" + "success=" + success + ", errorIdentification=" + errorIdentification + ", errorDescription=" + errorDescription + ", entity=" + entity + '}';
     }
-    
-    
-    
-    
 }

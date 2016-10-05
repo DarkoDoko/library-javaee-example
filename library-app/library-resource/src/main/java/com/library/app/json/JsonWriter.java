@@ -2,10 +2,6 @@ package com.library.app.json;
 
 import com.google.gson.Gson;
 
-/**
- *
- * @author ddoko
- */
 public class JsonWriter {
 
     private JsonWriter(){

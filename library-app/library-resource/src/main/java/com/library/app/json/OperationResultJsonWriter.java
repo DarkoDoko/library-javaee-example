@@ -4,10 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.library.app.common.model.OperationResult;
 
-/**
- *
- * @author ddoko
- */
 public class OperationResultJsonWriter {
 
     private OperationResultJsonWriter() {

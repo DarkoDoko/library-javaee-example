@@ -1,9 +1,5 @@
 package com.library.app.common.model;
 
-/**
- *
- * @author ddoko
- */
 public class ResourceMessage {
     private final String resource;
 
