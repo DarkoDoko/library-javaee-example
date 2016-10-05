@@ -1,7 +1,6 @@
 package com.library.app.category.resource;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.library.app.category.model.Category;
 import com.library.app.json.JsonReader;
@@ -42,7 +41,7 @@ public class CategoryResourceIntTest {
     
     private ResourceClient resourceClient;
     
-    private static final String PATH_RESOURCE = ResourceDefinitions.CATEGORY.getResourceName();
+    private static final String PATH_RESOURCE = "categories";
     
     @Deployment
     public static WebArchive createDeployment(){
