@@ -7,17 +7,13 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.library.app.InvalidJsonException;
 
-/**
- *
- * @author ddoko
- */
 public class JsonReader {
     
-    public static JsonObject readAsJsonObject(String json) {
+    public static JsonObject readAsJsonObject(String json) throws InvalidJsonException {
         return readJsonAs(json, JsonObject.class);
     }
     
-    public static JsonArray readAsJsonArray(String json){
+    public static JsonArray readAsJsonArray(String json) throws InvalidJsonException {
         return readJsonAs(json, JsonArray.class);
     }
     
