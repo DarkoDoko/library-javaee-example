@@ -1,8 +1,10 @@
 package com.library.app.author.resource;
 
+import com.google.gson.JsonElement;
 import com.library.app.FieldNotValidException;
 import com.library.app.author.AuthorNotFoundException;
 import com.library.app.author.model.Author;
+import com.library.app.author.model.AuthorFilter;
 import com.library.app.author.services.AuthorServices;
 import com.library.app.common.model.HttpCode;
 import com.library.app.common.model.OperationResult;
@@ -10,7 +12,9 @@ import com.library.app.common.model.ResourceMessage;
 import static com.library.app.common.model.StandardsOperationResults.getOperationResultInvalidField;
 import static com.library.app.common.model.StandardsOperationResults.getOperationResultNotFound;
 import com.library.app.json.JsonUtils;
+import com.library.app.json.JsonWriter;
 import com.library.app.json.OperationResultJsonWriter;
+import com.library.app.pagination.PaginatedData;
 import java.util.logging.Level;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -20,9 +24,11 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.UriInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +46,9 @@ public class AuthorResource {
     
     @Inject
     AuthorJsonConverter jsonConverter;
+    
+    @Context
+    UriInfo uriInfo;
 
     @POST
     public Response add(String body) {
@@ -111,6 +120,19 @@ public class AuthorResource {
         }
 
         return responseBuilder.build();    
+    }
+
+    @GET
+    public Response findByFilter() {
+        AuthorFilter filter = new AuthorFilterExtractorFromUrl(uriInfo).getFilter();
+        PaginatedData<Author> authors = services.findByFilter(filter);
+
+        JsonElement jsonWithPagingAndEntries = JsonUtils.getJsonElementWithPagingAndEntries(authors, jsonConverter);
+    
+        return Response
+                    .status(HttpCode.OK.getCode())
+                    .entity(JsonWriter.writeToString(jsonWithPagingAndEntries))
+                    .build();
     }
     
 }

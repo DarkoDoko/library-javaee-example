@@ -2,9 +2,13 @@ package com.library.app.author.resource;
 
 import com.library.app.FieldNotValidException;
 import static com.library.app.author.AuthorForTestsRepository.authorWithId;
+import static com.library.app.author.AuthorForTestsRepository.erichGamma;
+import static com.library.app.author.AuthorForTestsRepository.jamesGosling;
+import static com.library.app.author.AuthorForTestsRepository.martinFowler;
 import static com.library.app.author.AuthorForTestsRepository.robertMartin;
 import com.library.app.author.AuthorNotFoundException;
 import com.library.app.author.model.Author;
+import com.library.app.author.model.AuthorFilter;
 import com.library.app.author.services.AuthorServices;
 import com.library.app.common.model.HttpCode;
 import javax.ws.rs.core.Response;
@@ -19,98 +23,126 @@ import org.mockito.MockitoAnnotations;
 
 import static com.library.app.commontests.utils.FileTestNameUtils.*;
 import static com.library.app.commontests.utils.JsonTestUtils.*;
+import com.library.app.pagination.PaginatedData;
+import com.library.app.pagination.filter.PaginationData;
+import java.util.Arrays;
+import java.util.List;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriInfo;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 public class AuthorResourceTest {
 
-	private AuthorResource resourceUnderTest;
+    private AuthorResource resourceUnderTest;
 
-	private static final String PATH_RESOURCE = "authors";
+    private static final String PATH_RESOURCE = "authors";
 
-	@Mock
-	private AuthorServices services;
+    @Mock
+    private AuthorServices services;
+    
+    @Mock
+    private UriInfo uriInfo;
 
-	@Before
-	public void initTestCase() {
-		MockitoAnnotations.initMocks(this);
-		resourceUnderTest = new AuthorResource();
+    @Before
+    public void initTestCase() {
+        MockitoAnnotations.initMocks(this);
+        resourceUnderTest = new AuthorResource();
 
-		resourceUnderTest.services = services;
-		resourceUnderTest.jsonConverter = new AuthorJsonConverter();
-	}
+        resourceUnderTest.services = services;
+        resourceUnderTest.jsonConverter = new AuthorJsonConverter();
+        resourceUnderTest.uriInfo = uriInfo;
+    }
 
-	@Test
-	public void addValidAuthor() {
-		when(services.add(robertMartin())).thenReturn(authorWithId(robertMartin(), 1L));
+    @Test
+    public void addValidAuthor() {
+        when(services.add(robertMartin())).thenReturn(authorWithId(robertMartin(), 1L));
 
-		final Response response = resourceUnderTest
-				.add(readJsonFile(getPathFileRequest(PATH_RESOURCE, "robertMartin.json")));
-		assertThat(response.getStatus(), is(equalTo(HttpCode.CREATED.getCode())));
-		assertJsonMatchesExpectedJson(response.getEntity().toString(), "{\"id\": 1}");
-	}
+        final Response response = resourceUnderTest
+                        .add(readJsonFile(getPathFileRequest(PATH_RESOURCE, "robertMartin.json")));
+        assertThat(response.getStatus(), is(equalTo(HttpCode.CREATED.getCode())));
+        assertJsonMatchesExpectedJson(response.getEntity().toString(), "{\"id\": 1}");
+    }
 
-	@Test
-	public void addAuthorWithNullName() throws Exception {
-		when(services.add((Author) anyObject())).thenThrow(new FieldNotValidException("name", "may not be null"));
+    @Test
+    public void addAuthorWithNullName() throws Exception {
+        when(services.add((Author) anyObject())).thenThrow(new FieldNotValidException("name", "may not be null"));
 
-		final Response response = resourceUnderTest
-				.add(readJsonFile(getPathFileRequest(PATH_RESOURCE, "authorWithNullName.json")));
-		assertThat(response.getStatus(), is(equalTo(HttpCode.VALIDATION_ERROR.getCode())));
-		assertJsonResponseWithFile(response, "authorErrorNullName.json");
-	}
+        final Response response = resourceUnderTest
+                        .add(readJsonFile(getPathFileRequest(PATH_RESOURCE, "authorWithNullName.json")));
+        assertThat(response.getStatus(), is(equalTo(HttpCode.VALIDATION_ERROR.getCode())));
+        assertJsonResponseWithFile(response, "authorErrorNullName.json");
+    }
 
-	@Test
-	public void updateValidAuthor() throws Exception {
-		Response response = resourceUnderTest.update(1L,
-			readJsonFile(getPathFileRequest(PATH_RESOURCE, "robertMartin.json")));
+    @Test
+    public void updateValidAuthor() throws Exception {
+        Response response = resourceUnderTest.update(1L,
+                readJsonFile(getPathFileRequest(PATH_RESOURCE, "robertMartin.json")));
 
-		assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
-		assertThat(response.getEntity().toString(), is(equalTo("")));
+        assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
+        assertThat(response.getEntity().toString(), is(equalTo("")));
 
-		verify(services).update(authorWithId(robertMartin(), 1L));
-	}
+        verify(services).update(authorWithId(robertMartin(), 1L));
+    }
 
-	@Test
-	public void updateAuthorWithNullName() throws Exception {
-		doThrow(new FieldNotValidException("name", "may not be null")).when(services).update(
-				(Author) anyObject());
+    @Test
+    public void updateAuthorWithNullName() throws Exception {
+        doThrow(new FieldNotValidException("name", "may not be null")).when(services).update(
+                        (Author) anyObject());
 
-		final Response response = resourceUnderTest.update(1L,
-				readJsonFile(getPathFileRequest(PATH_RESOURCE, "authorWithNullName.json")));
-		assertThat(response.getStatus(), is(equalTo(HttpCode.VALIDATION_ERROR.getCode())));
-		assertJsonResponseWithFile(response, "authorErrorNullName.json");
-	}
+        final Response response = resourceUnderTest.update(1L,
+                        readJsonFile(getPathFileRequest(PATH_RESOURCE, "authorWithNullName.json")));
+        assertThat(response.getStatus(), is(equalTo(HttpCode.VALIDATION_ERROR.getCode())));
+        assertJsonResponseWithFile(response, "authorErrorNullName.json");
+    }
 
-	@Test
-	public void updateAuthorNotFound() throws Exception {
-		doThrow(new AuthorNotFoundException()).when(services).update(authorWithId(robertMartin(), 2L));
+    @Test
+    public void updateAuthorNotFound() throws Exception {
+        doThrow(new AuthorNotFoundException()).when(services).update(authorWithId(robertMartin(), 2L));
 
-		final Response response = resourceUnderTest.update(2L,
-				readJsonFile(getPathFileRequest(PATH_RESOURCE, "robertMartin.json")));
-		assertThat(response.getStatus(), is(equalTo(HttpCode.NOT_FOUND.getCode())));
-	}
+        final Response response = resourceUnderTest.update(2L,
+                        readJsonFile(getPathFileRequest(PATH_RESOURCE, "robertMartin.json")));
+        assertThat(response.getStatus(), is(equalTo(HttpCode.NOT_FOUND.getCode())));
+    }
 
-	@Test
-	public void findAuthor() throws AuthorNotFoundException {
-		when(services.findById(1L)).thenReturn(authorWithId(robertMartin(), 1L));
+    @Test
+    public void findAuthor() throws AuthorNotFoundException {
+        when(services.findById(1L)).thenReturn(authorWithId(robertMartin(), 1L));
 
-		final Response response = resourceUnderTest.findById(1L);
-		assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
-		assertJsonResponseWithFile(response, "robertMartinFound.json");
-	}
+        final Response response = resourceUnderTest.findById(1L);
+        assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
+        assertJsonResponseWithFile(response, "robertMartinFound.json");
+    }
 
-	@Test
-	public void findAuthorNotFound() throws AuthorNotFoundException {
-		when(services.findById(1L)).thenThrow(new AuthorNotFoundException());
+    @Test
+    public void findAuthorNotFound() throws AuthorNotFoundException {
+        when(services.findById(1L)).thenThrow(new AuthorNotFoundException());
 
-		final Response response = resourceUnderTest.findById(1L);
-		assertThat(response.getStatus(), is(equalTo(HttpCode.NOT_FOUND.getCode())));
-	}
+        final Response response = resourceUnderTest.findById(1L);
+        assertThat(response.getStatus(), is(equalTo(HttpCode.NOT_FOUND.getCode())));
+    }
 
-	private void assertJsonResponseWithFile(final Response response, final String fileName) {
-		assertJsonMatchesFileContent(response.getEntity().toString(), getPathFileResponse(PATH_RESOURCE, fileName));
-	}
+    @Test
+    public void findByFilterNoFilter() {
+        List<Author> authors = Arrays.asList(authorWithId(erichGamma(), 2L), authorWithId(jamesGosling(), 3L),
+                authorWithId(martinFowler(), 4L), authorWithId(robertMartin(), 1L));
+        
+        MultivaluedMap<String, String> multiMap = mock(MultivaluedMap.class);
+        when(uriInfo.getQueryParameters()).thenReturn(multiMap);
+
+        when(services.findByFilter((AuthorFilter) anyObject())).thenReturn(
+                new PaginatedData<>(authors.size(), authors));
+
+        Response response = resourceUnderTest.findByFilter();
+
+        assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
+        assertJsonResponseWithFile(response, "authorsAllInOnePage.json");
+    }
+
+    private void assertJsonResponseWithFile(final Response response, final String fileName) {
+        assertJsonMatchesFileContent(response.getEntity().toString(), getPathFileResponse(PATH_RESOURCE, fileName));
+    }
 
 }
