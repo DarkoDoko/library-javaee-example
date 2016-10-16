@@ -1,7 +1,10 @@
 package com.library.app.commontests.utils;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.library.app.common.model.HttpCode;
 import static com.library.app.commontests.utils.FileTestNameUtils.getPathFileRequest;
+import com.library.app.json.JsonReader;
 import javax.ws.rs.core.Response;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -33,5 +36,19 @@ public class IntTestUtils {
         
         assertThat(id, is(notNullValue()));
         return id;
+    }
+    
+    public static JsonArray assertJsonHasTheNumberOfElementsAndReturnTheEntries(Response response,
+            int expectedTotalRecords, int expectedEntriesForThisPage) {
+        
+        JsonObject result = JsonReader.readAsJsonObject(response.readEntity(String.class));
+        
+        int totalRecords = result.getAsJsonObject("paging").get("totalRecords").getAsInt();
+        assertThat(totalRecords, is(equalTo(expectedTotalRecords)));
+        
+        JsonArray entries = result.getAsJsonArray("entries");
+        assertThat(entries.size(), is(equalTo(expectedEntriesForThisPage)));
+        
+        return entries;
     }
 }
