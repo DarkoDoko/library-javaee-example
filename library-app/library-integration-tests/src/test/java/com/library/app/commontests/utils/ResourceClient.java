@@ -17,28 +17,28 @@ public class ResourceClient {
     private String resourcePath;
 
     public ResourceClient(final URL urlBase) {
-            this.urlBase = urlBase;
+        this.urlBase = urlBase;
     }
 
     public ResourceClient resourcePath(final String resourcePath) {
-            this.resourcePath = resourcePath;
-            return this;
+        this.resourcePath = resourcePath;
+        return this;
     }
 
     public Response postWithFile(final String fileName) {
-            return postWithContent(getRequestFromFileOrEmptyIfNullFile(fileName));
+        return postWithContent(getRequestFromFileOrEmptyIfNullFile(fileName));
     }
 
     public Response postWithContent(final String content) {
-            return buildClient().post(Entity.entity(content, MediaType.APPLICATION_JSON));
+        return buildClient().post(Entity.entity(content, MediaType.APPLICATION_JSON));
     }
 
     public Response putWithFile(final String fileName) {
-            return putWithContent(getRequestFromFileOrEmptyIfNullFile(fileName));
+        return putWithContent(getRequestFromFileOrEmptyIfNullFile(fileName));
     }
 
     public Response putWithContent(final String content) {
-            return buildClient().put(Entity.entity(content, MediaType.APPLICATION_JSON));
+        return buildClient().put(Entity.entity(content, MediaType.APPLICATION_JSON));
     }
 
     public void delete() {
@@ -50,22 +50,22 @@ public class ResourceClient {
     }
 
     private Builder buildClient() {
-            final Client resourceClient = ClientBuilder.newClient();
-            return resourceClient.target(getFullURL(resourcePath)).request();
+        final Client resourceClient = ClientBuilder.newClient();
+        return resourceClient.target(getFullURL(resourcePath)).request();
     }
 
     private String getFullURL(final String resourcePath) {
-            try {
-                return this.urlBase.toURI() + "api/" + resourcePath;
-            } catch (final URISyntaxException e) {
-                throw new IllegalArgumentException(e);
-            }
+        try {
+            return this.urlBase.toURI() + "api/" + resourcePath;
+        } catch (final URISyntaxException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     private String getRequestFromFileOrEmptyIfNullFile(final String fileName) {
-            if (fileName == null) {
-                    return "";
-            }
-            return readJsonFile(fileName);
+        if (fileName == null) {
+            return "";
+        }
+        return readJsonFile(fileName);
     }
 }
