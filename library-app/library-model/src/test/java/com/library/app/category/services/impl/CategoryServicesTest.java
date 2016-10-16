@@ -25,25 +25,21 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-/**
- *
- * @author ddoko
- */
 public class CategoryServicesTest {
     
     private CategoryServices servicesUnderTest;
-    private CategoryRepository repository;
-    private Validator validator;
+    private CategoryRepository repositoryCollaborator;
+    private Validator validatorCollaborator;
     
     @Before
     public void init(){
-        validator = Validation.buildDefaultValidatorFactory().getValidator();
-        repository = mock(CategoryRepository.class);
+        validatorCollaborator = Validation.buildDefaultValidatorFactory().getValidator();
+        repositoryCollaborator = mock(CategoryRepository.class);
         
         servicesUnderTest = new CategoryServicesImpl();
         
-        ((CategoryServicesImpl) servicesUnderTest).validator = validator;
-        ((CategoryServicesImpl) servicesUnderTest).repository = repository;
+        ((CategoryServicesImpl) servicesUnderTest).validator = validatorCollaborator;
+        ((CategoryServicesImpl) servicesUnderTest).repository = repositoryCollaborator;
     }
     
     @Test
@@ -63,8 +59,8 @@ public class CategoryServicesTest {
     
     @Test
     public void addValidCategory(){
-        when(repository.alreadyExists(java())).thenReturn(false);
-        when(repository.add(java())).thenReturn(categoryWithId(java(), 1L));
+        when(repositoryCollaborator.alreadyExists(java())).thenReturn(false);
+        when(repositoryCollaborator.add(java())).thenReturn(categoryWithId(java(), 1L));
         
         Category added = servicesUnderTest.add(java());
         assertThat(added.getId(), is(equalTo(1L)));
@@ -72,7 +68,7 @@ public class CategoryServicesTest {
 
     @Test(expected = CategoryExistentException.class)
     public void addCategoryWithExistantName(){
-        when(repository.alreadyExists(java())).thenReturn(true);
+        when(repositoryCollaborator.alreadyExists(java())).thenReturn(true);
         
         servicesUnderTest.add(java());
     }
@@ -94,32 +90,32 @@ public class CategoryServicesTest {
     
     @Test(expected = CategoryExistentException.class)
     public void updateCategoryWithExistantName(){
-        when(repository.alreadyExists(categoryWithId(java(), 1L))).thenReturn(true);
+        when(repositoryCollaborator.alreadyExists(categoryWithId(java(), 1L))).thenReturn(true);
         
         servicesUnderTest.update(categoryWithId(java(), 1L));
     }
     
     @Test(expected = CategoryNotFoundException.class)
     public void updateCategoryNotFound(){
-        when(repository.alreadyExists(categoryWithId(java(), 1L))).thenReturn(false);
-        when(repository.existsById(1L)).thenReturn(false);
+        when(repositoryCollaborator.alreadyExists(categoryWithId(java(), 1L))).thenReturn(false);
+        when(repositoryCollaborator.existsById(1L)).thenReturn(false);
         
         servicesUnderTest.update(categoryWithId(java(), 1L));
     }
     
     @Test
     public void updateValidCategory(){
-        when(repository.alreadyExists(categoryWithId(java(), 1L))).thenReturn(false);
-        when(repository.existsById(1L)).thenReturn(true);
+        when(repositoryCollaborator.alreadyExists(categoryWithId(java(), 1L))).thenReturn(false);
+        when(repositoryCollaborator.existsById(1L)).thenReturn(true);
         
         servicesUnderTest.update(categoryWithId(java(), 1L));
         
-        verify(repository).update(categoryWithId(java(), 1L));
+        verify(repositoryCollaborator).update(categoryWithId(java(), 1L));
     }
     
     @Test
     public void findCategoryById(){
-        when(repository.findById(1L)).thenReturn(categoryWithId(java(), 1L));
+        when(repositoryCollaborator.findById(1L)).thenReturn(categoryWithId(java(), 1L));
         
         Category category = servicesUnderTest.findById(1L);
         
@@ -130,14 +126,14 @@ public class CategoryServicesTest {
     
     @Test(expected = CategoryNotFoundException.class)
     public void findCategoryByIdNotFound(){
-        when(repository.findById(1L)).thenReturn(null);
+        when(repositoryCollaborator.findById(1L)).thenReturn(null);
         
         servicesUnderTest.findById(1L);
     }
     
     @Test
     public void findAllNoCategories(){
-        when(repository.findAll("name")).thenReturn(new ArrayList<>());
+        when(repositoryCollaborator.findAll("name")).thenReturn(new ArrayList<>());
         
         List<Category> categories = servicesUnderTest.findAll();
         
@@ -146,7 +142,7 @@ public class CategoryServicesTest {
     
     @Test
     public void findAllCategories(){
-        when(repository.findAll("name")).thenReturn(
+        when(repositoryCollaborator.findAll("name")).thenReturn(
                 Arrays.asList(categoryWithId(java(), 1L), categoryWithId(cleanCode(), 2L)));
         
         List<Category> categories = servicesUnderTest.findAll();
