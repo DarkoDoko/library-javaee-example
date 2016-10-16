@@ -35,7 +35,7 @@ public class CategoryResourceTest {
     private static final String PATH_RESOURCE = "categories";
     
     @Mock
-    private CategoryServices services;
+    private CategoryServices servicesCollaborator;
     
     @Before
     public void initTestCase() {
@@ -43,13 +43,13 @@ public class CategoryResourceTest {
         
         resourceUnderTest = new CategoryResource();
         
-        resourceUnderTest.services = services;
+        resourceUnderTest.services = servicesCollaborator;
         resourceUnderTest.jsonConverter = new CategoryJsonConverter();
     }
 
     @Test
     public void addValidCategory() {
-        when(services.add(java())).thenReturn(categoryWithId(java(), 1L));
+        when(servicesCollaborator.add(java())).thenReturn(categoryWithId(java(), 1L));
         
         Response response = resourceUnderTest.add(readJsonFile(getPathFileRequest(PATH_RESOURCE, "newCategory.json")));
         
@@ -59,7 +59,7 @@ public class CategoryResourceTest {
     
     @Test
     public void addExistentCategory(){
-        when(services.add(java())).thenThrow(new CategoryExistentException());
+        when(servicesCollaborator.add(java())).thenThrow(new CategoryExistentException());
         
         Response response = resourceUnderTest.add(readJsonFile(getPathFileRequest(PATH_RESOURCE, "newCategory.json")));
         
@@ -69,7 +69,7 @@ public class CategoryResourceTest {
     
     @Test
     public void addCategoryWithNullName() {
-        when(services.add(new Category())).thenThrow(new FieldNotValidException("name", "may not be null"));
+        when(servicesCollaborator.add(new Category())).thenThrow(new FieldNotValidException("name", "may not be null"));
         
         Response response = resourceUnderTest.add(
                 readJsonFile(getPathFileRequest(PATH_RESOURCE, "categoryWithNullName.json")));
@@ -86,12 +86,12 @@ public class CategoryResourceTest {
         assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
         assertThat(response.getEntity().toString(), is(equalTo("")));
         
-        verify(services).update(categoryWithId(java(), 1L));
+        verify(servicesCollaborator).update(categoryWithId(java(), 1L));
     }
     
     @Test
     public void updateCategoryWithNameBelongingToOtherCategory(){
-        doThrow(new CategoryExistentException()).when(services).update(categoryWithId(java(), 1L));
+        doThrow(new CategoryExistentException()).when(servicesCollaborator).update(categoryWithId(java(), 1L));
         
         Response response = resourceUnderTest.update(1L, 
                 readJsonFile(getPathFileRequest(PATH_RESOURCE, "category.json")));
@@ -103,7 +103,7 @@ public class CategoryResourceTest {
     @Test
     public void updateCategoryWithNullName(){
         doThrow(new FieldNotValidException("name", "may not be null")).
-                when(services).update(categoryWithId(new Category(), 1L));
+                when(servicesCollaborator).update(categoryWithId(new Category(), 1L));
         
         Response response = resourceUnderTest.update(1L, 
                 readJsonFile(getPathFileRequest(PATH_RESOURCE, "categoryWithNullName.json")));
@@ -114,7 +114,7 @@ public class CategoryResourceTest {
     
     @Test
     public void updateCategoryNotFound(){
-        doThrow(new CategoryNotFoundException()).when(services).update(categoryWithId(java(), 2L));
+        doThrow(new CategoryNotFoundException()).when(servicesCollaborator).update(categoryWithId(java(), 2L));
         
         Response response = resourceUnderTest.update(2L, 
                 readJsonFile(getPathFileRequest(PATH_RESOURCE, "category.json")));
@@ -125,7 +125,7 @@ public class CategoryResourceTest {
     
     @Test
     public void findCategory(){
-        when(services.findById(1L)).thenReturn(categoryWithId(java(), 1L));
+        when(servicesCollaborator.findById(1L)).thenReturn(categoryWithId(java(), 1L));
         
         Response response = resourceUnderTest.findById(1L);
         
@@ -135,7 +135,7 @@ public class CategoryResourceTest {
     
     @Test
     public void findCategoryNotFound(){
-        when(services.findById(1L)).thenThrow(new CategoryNotFoundException());
+        when(servicesCollaborator.findById(1L)).thenThrow(new CategoryNotFoundException());
         
         Response response = resourceUnderTest.findById(1L);
         
@@ -144,7 +144,7 @@ public class CategoryResourceTest {
     
     @Test
     public void findAllNoCategories(){
-        when(services.findAll()).thenReturn(new ArrayList<>());
+        when(servicesCollaborator.findAll()).thenReturn(new ArrayList<>());
         
         Response response = resourceUnderTest.findAll();
         
@@ -154,7 +154,7 @@ public class CategoryResourceTest {
     
     @Test
     public void findAllTwoCategories(){
-        when(services.findAll()).thenReturn(
+        when(servicesCollaborator.findAll()).thenReturn(
                 Arrays.asList(categoryWithId(java(), 1L), categoryWithId(networks(), 2L)));
         
         Response response = resourceUnderTest.findAll();
