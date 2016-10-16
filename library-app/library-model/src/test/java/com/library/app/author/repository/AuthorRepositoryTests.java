@@ -9,12 +9,7 @@ import com.library.app.author.model.AuthorFilter;
 import com.library.app.pagination.PaginatedData;
 import com.library.app.pagination.filter.PaginationData;
 import com.library.app.pagination.filter.PaginationData.OrderMode;
-import com.library.app.commontests.utils.DBCommandTransactionalExecutor;
 import com.library.app.commontests.utils.TestBaseRepository;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import org.hamcrest.CoreMatchers;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -71,7 +66,6 @@ public class AuthorRepositoryTests extends TestBaseRepository {
         assertThat(authorAddedId, is(notNullValue()));
         
         Author author = repositoryUnderTest.findById(authorAddedId);
-        assertThat(author, is(notNullValue()));
         assertThat(author.getName(), is(equalTo(robertMartin().getName())));
         
         author.setName("Uncle Bob");
@@ -81,7 +75,6 @@ public class AuthorRepositoryTests extends TestBaseRepository {
         });
         
         Author authorAfterUpdate = repositoryUnderTest.findById(authorAddedId);
-        assertThat(authorAfterUpdate, is(notNullValue()));
         assertThat(authorAfterUpdate.getName(), is(equalTo("Uncle Bob")));
     }
     
