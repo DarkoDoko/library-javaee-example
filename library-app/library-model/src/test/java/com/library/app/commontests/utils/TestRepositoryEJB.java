@@ -1,5 +1,6 @@
 package com.library.app.commontests.utils;
 
+import com.library.app.author.model.Author;
 import com.library.app.category.model.Category;
 import java.util.Arrays;
 import java.util.List;
@@ -15,18 +16,18 @@ public class TestRepositoryEJB {
     @PersistenceContext
     private EntityManager em;
     
-    private static final List<Class<?>> ENTITIES_TO_REMOVE = Arrays.asList(Category.class);
+    private static final List<Class<?>> ENTITIES_TO_REMOVE = Arrays.asList(Category.class, Author.class);
     
     public void deleteAll(){
-        for(Class<?> entityClass : ENTITIES_TO_REMOVE){
+        ENTITIES_TO_REMOVE.forEach((entityClass) -> {
             deleteAllForEntity(entityClass);
-        }
+        });
     }
     
     private void deleteAllForEntity(Class<?> entityClass){
         List<Object> rows = em.createQuery("SELECT e FROM " + entityClass.getSimpleName() + " e").getResultList();
-        for(Object row : rows){
+        rows.forEach((row) -> {
             em.remove(row);
-        }
+        });
     }
 }
