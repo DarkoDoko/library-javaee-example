@@ -41,24 +41,24 @@ public class AuthorResourceTest {
     private static final String PATH_RESOURCE = "authors";
 
     @Mock
-    private AuthorServices services;
+    private AuthorServices servicesCollaborator;
     
     @Mock
-    private UriInfo uriInfo;
+    private UriInfo uriInfoCollaborator;
 
     @Before
     public void initTestCase() {
         MockitoAnnotations.initMocks(this);
         resourceUnderTest = new AuthorResource();
 
-        resourceUnderTest.services = services;
+        resourceUnderTest.services = servicesCollaborator;
         resourceUnderTest.jsonConverter = new AuthorJsonConverter();
-        resourceUnderTest.uriInfo = uriInfo;
+        resourceUnderTest.uriInfo = uriInfoCollaborator;
     }
 
     @Test
     public void addValidAuthor() {
-        when(services.add(robertMartin())).thenReturn(authorWithId(robertMartin(), 1L));
+        when(servicesCollaborator.add(robertMartin())).thenReturn(authorWithId(robertMartin(), 1L));
 
         final Response response = resourceUnderTest
                         .add(readJsonFile(getPathFileRequest(PATH_RESOURCE, "robertMartin.json")));
@@ -68,7 +68,7 @@ public class AuthorResourceTest {
 
     @Test
     public void addAuthorWithNullName() throws Exception {
-        when(services.add((Author) anyObject())).thenThrow(new FieldNotValidException("name", "may not be null"));
+        when(servicesCollaborator.add((Author) anyObject())).thenThrow(new FieldNotValidException("name", "may not be null"));
 
         final Response response = resourceUnderTest
                         .add(readJsonFile(getPathFileRequest(PATH_RESOURCE, "authorWithNullName.json")));
@@ -84,12 +84,12 @@ public class AuthorResourceTest {
         assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
         assertThat(response.getEntity().toString(), is(equalTo("")));
 
-        verify(services).update(authorWithId(robertMartin(), 1L));
+        verify(servicesCollaborator).update(authorWithId(robertMartin(), 1L));
     }
 
     @Test
     public void updateAuthorWithNullName() throws Exception {
-        doThrow(new FieldNotValidException("name", "may not be null")).when(services).update(
+        doThrow(new FieldNotValidException("name", "may not be null")).when(servicesCollaborator).update(
                         (Author) anyObject());
 
         final Response response = resourceUnderTest.update(1L,
@@ -100,7 +100,7 @@ public class AuthorResourceTest {
 
     @Test
     public void updateAuthorNotFound() throws Exception {
-        doThrow(new AuthorNotFoundException()).when(services).update(authorWithId(robertMartin(), 2L));
+        doThrow(new AuthorNotFoundException()).when(servicesCollaborator).update(authorWithId(robertMartin(), 2L));
 
         final Response response = resourceUnderTest.update(2L,
                         readJsonFile(getPathFileRequest(PATH_RESOURCE, "robertMartin.json")));
@@ -109,7 +109,7 @@ public class AuthorResourceTest {
 
     @Test
     public void findAuthor() throws AuthorNotFoundException {
-        when(services.findById(1L)).thenReturn(authorWithId(robertMartin(), 1L));
+        when(servicesCollaborator.findById(1L)).thenReturn(authorWithId(robertMartin(), 1L));
 
         final Response response = resourceUnderTest.findById(1L);
         assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
@@ -118,7 +118,7 @@ public class AuthorResourceTest {
 
     @Test
     public void findAuthorNotFound() throws AuthorNotFoundException {
-        when(services.findById(1L)).thenThrow(new AuthorNotFoundException());
+        when(servicesCollaborator.findById(1L)).thenThrow(new AuthorNotFoundException());
 
         final Response response = resourceUnderTest.findById(1L);
         assertThat(response.getStatus(), is(equalTo(HttpCode.NOT_FOUND.getCode())));
@@ -130,9 +130,9 @@ public class AuthorResourceTest {
                 authorWithId(martinFowler(), 4L), authorWithId(robertMartin(), 1L));
         
         MultivaluedMap<String, String> multiMap = mock(MultivaluedMap.class);
-        when(uriInfo.getQueryParameters()).thenReturn(multiMap);
+        when(uriInfoCollaborator.getQueryParameters()).thenReturn(multiMap);
 
-        when(services.findByFilter((AuthorFilter) anyObject())).thenReturn(
+        when(servicesCollaborator.findByFilter((AuthorFilter) anyObject())).thenReturn(
                 new PaginatedData<>(authors.size(), authors));
 
         Response response = resourceUnderTest.findByFilter();
@@ -141,7 +141,7 @@ public class AuthorResourceTest {
         assertJsonResponseWithFile(response, "authorsAllInOnePage.json");
     }
 
-    private void assertJsonResponseWithFile(final Response response, final String fileName) {
+    private void assertJsonResponseWithFile(Response response, String fileName) {
         assertJsonMatchesFileContent(response.getEntity().toString(), getPathFileResponse(PATH_RESOURCE, fileName));
     }
 
