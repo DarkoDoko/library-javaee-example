@@ -16,6 +16,7 @@ import com.library.app.common.model.ResourceMessage;
 import static com.library.app.common.model.StandardsOperationResults.getOperationResultExistent;
 import static com.library.app.common.model.StandardsOperationResults.getOperationResultInvalidField;
 import static com.library.app.common.model.StandardsOperationResults.getOperationResultNotFound;
+import com.library.app.pagination.PaginatedData;
 import java.util.List;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -139,23 +140,13 @@ public class CategoryResource {
         
         logger.debug("Found {} categories", categories.size());
         
-        JsonElement jsonWithPagingAndEntries = getJsonElementWithPagingAndEntries(categories);
+        JsonElement jsonWithPagingAndEntries = JsonUtils.getJsonElementWithPagingAndEntries(
+                new PaginatedData<>(categories.size(), categories),
+                jsonConverter);
         
         return Response
                 .status(HttpCode.OK.getCode())
                 .entity(JsonWriter.writeToString(jsonWithPagingAndEntries))
                 .build();
-    }
-
-    private JsonElement getJsonElementWithPagingAndEntries(List<Category> categories) {
-        JsonObject jsonWithEntriesAndPaging = new JsonObject();
-        JsonObject jsonPaging = new JsonObject();
-        
-        jsonPaging.addProperty("totalRecords", categories.size());
-        
-        jsonWithEntriesAndPaging.add("paging", jsonPaging);
-        jsonWithEntriesAndPaging.add("entries", jsonConverter.convertToJsonElement(categories));
-        
-        return jsonWithEntriesAndPaging;
     }
 }
