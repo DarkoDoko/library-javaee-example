@@ -7,20 +7,20 @@ import org.junit.Ignore;
 
 @Ignore
 public class TestBaseRepository {
-	private EntityManagerFactory emf;
+    private EntityManagerFactory emf;
 
-	protected EntityManager em;
-	protected DBCommandTransactionalExecutor dbExecutor;
+    protected EntityManager em;
+    protected DBCommandTransactionalExecutor dbExecutor;
 
-	protected void initializeTestDB() {
-		emf = Persistence.createEntityManagerFactory("libraryPU");
-		em = emf.createEntityManager();
+    protected void initializeTestDB() {
+        emf = Persistence.createEntityManagerFactory("libraryPU");
+        em = emf.createEntityManager();
 
-		dbExecutor = new DBCommandTransactionalExecutor(em);
-	}
+        dbExecutor = new DBCommandTransactionalExecutor(em);
+    }
 
-	protected void closeEntityManager() {
-		em.close();
-		emf.close();
-	}
+    protected void closeEntityManager() {
+        em.close();
+        emf.close();
+    }
 }

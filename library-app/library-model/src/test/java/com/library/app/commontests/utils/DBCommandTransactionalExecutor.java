@@ -3,10 +3,6 @@ package com.library.app.commontests.utils;
 import javax.persistence.EntityManager;
 import org.junit.Ignore;
 
-/**
- *
- * @author ddoko
- */
 @Ignore
 public class DBCommandTransactionalExecutor {
     
