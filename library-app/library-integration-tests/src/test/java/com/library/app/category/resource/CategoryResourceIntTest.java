@@ -9,10 +9,12 @@ import static com.library.app.category.CategoryForTestsRepository.architecture;
 import static com.library.app.category.CategoryForTestsRepository.cleanCode;
 import static com.library.app.category.CategoryForTestsRepository.java;
 import static com.library.app.category.CategoryForTestsRepository.networks;
+import com.library.app.commontests.utils.ArquillianTestUtils;
 import static com.library.app.commontests.utils.FileTestNameUtils.getPathFileRequest;
 import static com.library.app.commontests.utils.FileTestNameUtils.getPathFileResponse;
 import com.library.app.commontests.utils.IntTestUtils;
 import static com.library.app.commontests.utils.IntTestUtils.addElementWithFileAndGetId;
+import static com.library.app.commontests.utils.IntTestUtils.assertJsonHasTheNumberOfElementsAndReturnTheEntries;
 import static com.library.app.commontests.utils.JsonTestUtils.assertJsonMatchesFileContent;
 import com.library.app.commontests.utils.ResourceClient;
 import java.io.File;
@@ -45,15 +47,7 @@ public class CategoryResourceIntTest {
     
     @Deployment
     public static WebArchive createDeployment(){
-        return ShrinkWrap.create(WebArchive.class)
-                .addPackages(true, "com.library.app")
-                .addAsResource("persistence-integration.xml", "META-INF/persistence.xml")
-                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-                .setWebXML(new File("src/test/resources/web.xml"))
-                .addAsLibraries(Maven.resolver()
-                                    .resolve("com.google.code.gson:gson:2.3.1", "org.mockito:mockito-core:1.9.5")
-                                    .withTransitivity()
-                                    .asFile());
+        return ArquillianTestUtils.createDeploymentArchive();
     }
     
     @Before
@@ -150,14 +144,12 @@ public class CategoryResourceIntTest {
     }
     
     private void assertResponseContainsTheCategories(Response response, int expectedTotalRecords, Category... expectedCategories){
-        JsonObject result = JsonReader.readAsJsonObject(response.readEntity(String.class));
         
-        int totalRecords = result.getAsJsonObject("paging").get("totalRecords").getAsInt();
-        assertThat(totalRecords, is(equalTo(expectedTotalRecords)));
-        
-        JsonArray categoriesList = result.getAsJsonArray("entries");
-        assertThat(categoriesList.size(), is(equalTo(expectedCategories.length)));
-        
+        JsonArray categoriesList = assertJsonHasTheNumberOfElementsAndReturnTheEntries(
+                                        response,
+                                        expectedTotalRecords,
+                                        expectedTotalRecords);
+                
         for(int i = 0; i < expectedCategories.length; i++){
             Category expectedCategory = expectedCategories[i];
             assertThat(
