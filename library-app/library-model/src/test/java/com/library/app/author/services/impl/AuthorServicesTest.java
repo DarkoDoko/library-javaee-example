@@ -94,64 +94,64 @@ public class AuthorServicesTest {
     
     @Test(expected = AuthorNotFoundException.class)
     public void updateAuthorNotFound() throws Exception {
-            when(repositoryCollaborator.existsById(1L)).thenReturn(false);
+        when(repositoryCollaborator.existsById(1L)).thenReturn(false);
 
-            servicesUnderTest.update(authorWithId(robertMartin(), 1L));
+        servicesUnderTest.update(authorWithId(robertMartin(), 1L));
     }
 
     @Test
     public void updateValidAuthor() throws Exception {
-            final Author authorToUpdate = authorWithId(robertMartin(), 1L);
-            when(repositoryCollaborator.existsById(1L)).thenReturn(true);
+        final Author authorToUpdate = authorWithId(robertMartin(), 1L);
+        when(repositoryCollaborator.existsById(1L)).thenReturn(true);
 
-            servicesUnderTest.update(authorToUpdate);
-            verify(repositoryCollaborator).update(authorToUpdate);
+        servicesUnderTest.update(authorToUpdate);
+        verify(repositoryCollaborator).update(authorToUpdate);
     }
 
     @Test(expected = AuthorNotFoundException.class)
     public void findAuthorByIdNotFound() throws AuthorNotFoundException {
-            when(repositoryCollaborator.findById(1L)).thenReturn(null);
+        when(repositoryCollaborator.findById(1L)).thenReturn(null);
 
-            servicesUnderTest.findById(1L);
+        servicesUnderTest.findById(1L);
     }
 
     @Test
     public void findAuthorById() throws AuthorNotFoundException {
-            when(repositoryCollaborator.findById(1L)).thenReturn(authorWithId(robertMartin(), 1L));
+        when(repositoryCollaborator.findById(1L)).thenReturn(authorWithId(robertMartin(), 1L));
 
-            final Author author = servicesUnderTest.findById(1L);
-            assertThat(author, is(notNullValue()));
-            assertThat(author.getName(), is(equalTo(robertMartin().getName())));
+        final Author author = servicesUnderTest.findById(1L);
+        assertThat(author, is(notNullValue()));
+        assertThat(author.getName(), is(equalTo(robertMartin().getName())));
     }
 
     @Test
     public void findAuthorByFilter() {
-            final PaginatedData<Author> authors = new PaginatedData<Author>(1, Arrays.asList(authorWithId(robertMartin(),
-                            1L)));
-            when(repositoryCollaborator.findByFilter((AuthorFilter) anyObject())).thenReturn(authors);
+        final PaginatedData<Author> authors = new PaginatedData<>(1, Arrays.asList(authorWithId(robertMartin(),
+                        1L)));
+        when(repositoryCollaborator.findByFilter((AuthorFilter) anyObject())).thenReturn(authors);
 
-            final PaginatedData<Author> authorsReturned = servicesUnderTest.findByFilter(new AuthorFilter());
-            assertThat(authorsReturned.getNumberOfRows(), is(equalTo(1)));
-            assertThat(authorsReturned.getRow(0).getName(), is(equalTo(robertMartin().getName())));
-    }
+        final PaginatedData<Author> authorsReturned = servicesUnderTest.findByFilter(new AuthorFilter());
+        assertThat(authorsReturned.getNumberOfRows(), is(equalTo(1)));
+        assertThat(authorsReturned.getRow(0).getName(), is(equalTo(robertMartin().getName())));
+}
 
     private void updateAuthorWithInvalidName(final String name) {
-            try {
-                    servicesUnderTest.update(new Author(name));
-                    fail("An error should have been thrown");
-            } catch (final FieldNotValidException e) {
-                    assertThat(e.getFieldName(), is(equalTo("name")));
-            } catch (AuthorNotFoundException ex) {
-                Logger.getLogger(AuthorServicesTest.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        try {
+            servicesUnderTest.update(new Author(name));
+            fail("An error should have been thrown");
+        } catch (final FieldNotValidException e) {
+            assertThat(e.getFieldName(), is(equalTo("name")));
+        } catch (AuthorNotFoundException ex) {
+            Logger.getLogger(AuthorServicesTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private void addAuthorWithInvalidName(final String name) {
-            try {
-                    servicesUnderTest.add(new Author(name));
-                    fail("An error should have been thrown");
-            } catch (final FieldNotValidException e) {
-                    assertThat(e.getFieldName(), is(equalTo("name")));
-            }
+        try {
+            servicesUnderTest.add(new Author(name));
+            fail("An error should have been thrown");
+        } catch (final FieldNotValidException e) {
+            assertThat(e.getFieldName(), is(equalTo("name")));
+        }
     }
 }
