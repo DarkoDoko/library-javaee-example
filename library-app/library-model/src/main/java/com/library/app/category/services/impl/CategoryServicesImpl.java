@@ -6,6 +6,7 @@ import com.library.app.category.model.Category;
 import com.library.app.category.repository.CategoryRepository;
 import com.library.app.category.services.CategoryServices;
 import com.library.app.FieldNotValidException;
+import com.library.app.ValidationUtils;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -67,13 +68,11 @@ public class CategoryServicesImpl implements CategoryServices{
     }
 
     private void validateCategoryFields(Category category) {
-        Set<ConstraintViolation<Category>> errors = validator.validate(category);
-        Iterator<ConstraintViolation<Category>> iterErrors = errors.iterator();
         
-        if(iterErrors.hasNext()) {
-            ConstraintViolation<Category> violation = iterErrors.next();
-            throw new FieldNotValidException(
-                    violation.getPropertyPath().toString(), violation.getMessage());
+        ValidationUtils.validateEntityFields(validator, category);
+        
+        if(repository.alreadyExists(category)) {
+            throw new CategoryExistentException();
         }
     }
     
