@@ -1,7 +1,6 @@
 package com.library.app.author.model;
 
 import com.library.app.pagination.filter.GenericFilter;
-import com.library.app.pagination.filter.PaginationData;
 
 public class AuthorFilter extends GenericFilter{
     
