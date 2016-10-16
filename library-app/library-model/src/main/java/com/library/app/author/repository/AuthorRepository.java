@@ -66,9 +66,9 @@ public class AuthorRepository extends GenericRepository<Author>{
     }
 
     private void applyParametersOnQuery(Map<String, Object> queryParameters, Query query) {
-        for(Entry<String, Object> entryMap : queryParameters.entrySet()){
+        queryParameters.entrySet().forEach((entryMap) -> {
             query.setParameter(entryMap.getKey(), entryMap.getValue());
-        }
+        });
     }
     
 }
