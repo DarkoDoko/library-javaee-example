@@ -22,7 +22,7 @@ import org.mockito.MockitoAnnotations;
 public class AuthorFilterExtractorFromUrlTest {
 
     @Mock
-    private UriInfo uriInfo;
+    private UriInfo uriInfoCollaborator;
 
     @Before
     public void initTestCase() {
@@ -33,35 +33,34 @@ public class AuthorFilterExtractorFromUrlTest {
     public void onlyDefaultValues() {
         setUpUriInfo(null, null, null, null);
 
-        final AuthorFilterExtractorFromUrl extractor = new AuthorFilterExtractorFromUrl(uriInfo);
-        final AuthorFilter authorFilter = extractor.getFilter();
+        final AuthorFilterExtractorFromUrl extractorUnderTest = new AuthorFilterExtractorFromUrl(uriInfoCollaborator);
+        final AuthorFilter authorFilter = extractorUnderTest.getFilter();
 
         assertActualPaginationDataWithExpected(authorFilter.getPaginationData(), new PaginationData(0, 10, "name",
                         OrderMode.ASCENDING));
         assertThat(authorFilter.getName(), is(nullValue()));
     }
 
-    private void setUpUriInfo(final String page, final String perPage, final String name, final String sort) {
-        final Map<String, String> parameters = new LinkedHashMap<>();
+    private void setUpUriInfo(String page, String perPage, String name, String sort) {
+        Map<String, String> parameters = new LinkedHashMap<>();
         parameters.put("page", page);
         parameters.put("per_page", perPage);
         parameters.put("name", name);
         parameters.put("sort", sort);
 
-        final MultivaluedMap<String, String> multiMap = mock(MultivaluedMap.class);
+        MultivaluedMap<String, String> multiMap = mock(MultivaluedMap.class);
 
-        for (final Entry<String, String> keyValue : parameters.entrySet()) {
-                when(multiMap.getFirst(keyValue.getKey())).thenReturn(keyValue.getValue());
-        }
+        parameters.entrySet().forEach((keyValue) -> {
+            when(multiMap.getFirst(keyValue.getKey())).thenReturn(keyValue.getValue());
+        });
 
-        when(uriInfo.getQueryParameters()).thenReturn(multiMap);
+        when(uriInfoCollaborator.getQueryParameters()).thenReturn(multiMap);
     }
     
-    private static void assertActualPaginationDataWithExpected(final PaginationData actual,
-			final PaginationData expected) {
-            assertThat(actual.getFirstResult(), is(equalTo(expected.getFirstResult())));
-            assertThat(actual.getMaxResults(), is(equalTo(expected.getMaxResults())));
-            assertThat(actual.getOrderField(), is(equalTo(expected.getOrderField())));
-            assertThat(actual.getOrderMode(), is(equalTo(expected.getOrderMode())));
-	}
+    private static void assertActualPaginationDataWithExpected(PaginationData actual, PaginationData expected) {
+        assertThat(actual.getFirstResult(), is(equalTo(expected.getFirstResult())));
+        assertThat(actual.getMaxResults(), is(equalTo(expected.getMaxResults())));
+        assertThat(actual.getOrderField(), is(equalTo(expected.getOrderField())));
+        assertThat(actual.getOrderMode(), is(equalTo(expected.getOrderMode())));
+    }
 }
