@@ -14,9 +14,9 @@ public interface EntityJsonConverter<T> {
     default JsonElement convertToJsonElement(List<T> entities) {
     	JsonArray jsonArray = new JsonArray();
 
-    	for(T entity : entities) {
-    		jsonArray.add(convertToJsonElement(entity));
-    	}
+        entities.forEach((entity) -> {
+            jsonArray.add(convertToJsonElement(entity));
+        });
 
     	return jsonArray;
     }
