@@ -96,6 +96,22 @@ public class UserRepositoryTest extends TestBaseRepository {
         assertThat(repositoryUnderTest.alreadyExists(customer), is(equalTo(false)));
     }
 
+    @Test
+    public void findUserByEmail() {
+        dbExecutor.executeCommand(() -> {
+            return repositoryUnderTest.add(johnDoe());
+        });
+
+        User user = repositoryUnderTest.findByEmail(johnDoe().getEmail());
+        assertUser(user, johnDoe(), UserType.CUSTOMER);
+    }
+
+    @Test
+    public void findUserByEmailNotFound() {
+        User user = repositoryUnderTest.findByEmail(johnDoe().getEmail());
+        assertThat(user, is(nullValue()));
+    }
+
     private void assertUser(final User actualUser, final User expectedUser, final UserType expectedUserType) {
         assertThat(actualUser.getName(), is(equalTo(expectedUser.getName())));
         assertThat(actualUser.getEmail(), is(equalTo(expectedUser.getEmail())));
