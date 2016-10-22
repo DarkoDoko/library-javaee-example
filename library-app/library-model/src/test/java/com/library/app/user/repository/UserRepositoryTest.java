@@ -2,6 +2,7 @@ package com.library.app.user.repository;
 
 import com.library.app.commontests.utils.TestBaseRepository;
 import com.library.app.user.UserForTestsRepository;
+import static com.library.app.user.UserForTestsRepository.admin;
 import static com.library.app.user.UserForTestsRepository.johnDoe;
 import com.library.app.user.model.User;
 import com.library.app.user.model.User.UserType;
@@ -67,6 +68,16 @@ public class UserRepositoryTest extends TestBaseRepository{
 
         final User userAfterUpdate = repositoryUnderTest.findById(userAddedId);
         assertThat(userAfterUpdate.getName(), is(equalTo("New name")));
+    }
+    
+    @Test
+    public void alreadyExistsUserWithoutId() {
+        dbExecutor.executeCommand(() -> {
+                return repositoryUnderTest.add(johnDoe()).getId();
+        });
+
+        assertThat(repositoryUnderTest.alreadyExists(johnDoe()), is(equalTo(true)));
+        assertThat(repositoryUnderTest.alreadyExists(admin()), is(equalTo(false)));
     }
     
     private void assertUser(final User actualUser, final User expectedUser, final UserType expectedUserType) {

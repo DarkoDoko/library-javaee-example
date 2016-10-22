@@ -20,4 +20,8 @@ public class UserRepository extends GenericRepository<User>{
         return em;
     }
     
+    public boolean alreadyExists(User user){
+        return alreadyExists("email", user.getEmail(), user.getId());
+    }
+    
 }
