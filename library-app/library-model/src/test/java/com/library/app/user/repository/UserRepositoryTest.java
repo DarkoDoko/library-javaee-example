@@ -16,18 +16,18 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Before;
 
-public class UserRepositoryTest extends TestBaseRepository{
-    
+public class UserRepositoryTest extends TestBaseRepository {
+
     private UserRepository repositoryUnderTest;
-    
+
     @Before
     public void initTestCase() {
         initializeTestDB();
-        
+
         repositoryUnderTest = new UserRepository();
         repositoryUnderTest.em = em;
     }
-    
+
     @After
     public void setDownTestCase() {
         closeEntityManager();
@@ -39,17 +39,17 @@ public class UserRepositoryTest extends TestBaseRepository{
             return repositoryUnderTest.add(johnDoe()).getId();
         });
         assertThat(userAddedId, is(notNullValue()));
-        
+
         User user = repositoryUnderTest.findById(userAddedId);
         assertUser(user, johnDoe(), UserType.CUSTOMER);
     }
-    
+
     @Test
     public void findUseryIdNotFound() {
         User user = repositoryUnderTest.findById(999L);
         assertThat(user, is(nullValue()));
     }
-    
+
     @Test
     public void updateCustomer() {
         Long userAddedId = dbExecutor.executeCommand(() -> {
@@ -69,17 +69,33 @@ public class UserRepositoryTest extends TestBaseRepository{
         final User userAfterUpdate = repositoryUnderTest.findById(userAddedId);
         assertThat(userAfterUpdate.getName(), is(equalTo("New name")));
     }
-    
+
     @Test
     public void alreadyExistsUserWithoutId() {
         dbExecutor.executeCommand(() -> {
-                return repositoryUnderTest.add(johnDoe()).getId();
+            return repositoryUnderTest.add(johnDoe()).getId();
         });
 
         assertThat(repositoryUnderTest.alreadyExists(johnDoe()), is(equalTo(true)));
         assertThat(repositoryUnderTest.alreadyExists(admin()), is(equalTo(false)));
     }
-    
+
+    @Test
+    public void alreadyExistsUserWithId() {
+        final User customer = dbExecutor.executeCommand(() -> {
+            repositoryUnderTest.add(admin());
+            return repositoryUnderTest.add(johnDoe());
+        });
+
+        assertFalse(repositoryUnderTest.alreadyExists(customer));
+
+        customer.setEmail(admin().getEmail());
+        assertThat(repositoryUnderTest.alreadyExists(customer), is(equalTo(true)));
+
+        customer.setEmail("newemail@domain.com");
+        assertThat(repositoryUnderTest.alreadyExists(customer), is(equalTo(false)));
+    }
+
     private void assertUser(final User actualUser, final User expectedUser, final UserType expectedUserType) {
         assertThat(actualUser.getName(), is(equalTo(expectedUser.getName())));
         assertThat(actualUser.getEmail(), is(equalTo(expectedUser.getEmail())));
@@ -88,5 +104,5 @@ public class UserRepositoryTest extends TestBaseRepository{
         assertThat(actualUser.getPassword(), is(expectedUser.getPassword()));
         assertThat(actualUser.getUserType(), is(equalTo(expectedUserType)));
     }
-    
+
 }
