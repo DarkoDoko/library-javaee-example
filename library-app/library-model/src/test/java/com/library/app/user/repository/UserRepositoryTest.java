@@ -9,6 +9,7 @@ import org.hamcrest.CoreMatchers;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import org.junit.After;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -40,6 +41,12 @@ public class UserRepositoryTest extends TestBaseRepository{
         
         User user = repositoryUnderTest.findById(userAddedId);
         assertUser(user, johnDoe(), UserType.CUSTOMER);
+    }
+    
+    @Test
+    public void findUseryIdNotFound() {
+        User user = repositoryUnderTest.findById(999L);
+        assertThat(user, is(nullValue()));
     }
     
     private void assertUser(final User actualUser, final User expectedUser, final UserType expectedUserType) {
