@@ -49,6 +49,26 @@ public class UserRepositoryTest extends TestBaseRepository{
         assertThat(user, is(nullValue()));
     }
     
+    @Test
+    public void updateCustomer() {
+        Long userAddedId = dbExecutor.executeCommand(() -> {
+            return repositoryUnderTest.add(johnDoe()).getId();
+        });
+        assertThat(userAddedId, is(notNullValue()));
+
+        User user = repositoryUnderTest.findById(userAddedId);
+        assertThat(user.getName(), is(equalTo(johnDoe().getName())));
+
+        user.setName("New name");
+        dbExecutor.executeCommand(() -> {
+            repositoryUnderTest.update(user);
+            return null;
+        });
+
+        final User userAfterUpdate = repositoryUnderTest.findById(userAddedId);
+        assertThat(userAfterUpdate.getName(), is(equalTo("New name")));
+    }
+    
     private void assertUser(final User actualUser, final User expectedUser, final UserType expectedUserType) {
         assertThat(actualUser.getName(), is(equalTo(expectedUser.getName())));
         assertThat(actualUser.getEmail(), is(equalTo(expectedUser.getEmail())));
