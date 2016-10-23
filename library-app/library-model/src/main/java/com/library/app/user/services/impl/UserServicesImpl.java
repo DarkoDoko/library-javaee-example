@@ -56,6 +56,15 @@ public class UserServicesImpl implements UserServices {
         repository.update(user);
     }
 
+    @Override
+    public User findByEmail(String email) throws UserNotFoundException {
+        User user = repository.findByEmail(email);
+        if (user == null) {
+            throw new UserNotFoundException();
+        }
+        return user;
+    }
+
     private void validateUser(User user) throws FieldNotValidException {
         if (repository.alreadyExists(user)) {
             throw new UserExistentException();

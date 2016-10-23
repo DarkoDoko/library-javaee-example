@@ -175,6 +175,22 @@ public class UserServicesTest {
         verify(userRepository).update(userEq(expectedUser));
     }
 
+    @Test(expected = UserNotFoundException.class)
+    public void findUserByEmailNotFound() throws UserNotFoundException {
+        when(userRepository.findByEmail(johnDoe().getEmail())).thenReturn(null);
+
+        userServices.findByEmail(johnDoe().getEmail());
+    }
+
+    @Test
+    public void findUserByEmail() throws UserNotFoundException {
+        when(userRepository.findByEmail(johnDoe().getEmail())).thenReturn(userWithIdAndCreatedAt(johnDoe(), 1L));
+
+        final User user = userServices.findByEmail(johnDoe().getEmail());
+        assertThat(user, is(notNullValue()));
+        assertThat(user.getName(), is(equalTo(johnDoe().getName())));
+    }
+
     private void addUserWithInvalidField(final User user, final String expectedInvalidFieldName) {
         try {
             userServices.add(user);
