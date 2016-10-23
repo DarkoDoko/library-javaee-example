@@ -1,6 +1,7 @@
 package com.library.app.user.services.impl;
 
 import com.library.app.FieldNotValidException;
+import static com.library.app.user.UserArgumentMatcher.userEq;
 import com.library.app.user.UserExistentException;
 import static com.library.app.user.UserForTestsRepository.johnDoe;
 import static com.library.app.user.UserForTestsRepository.userWithEncryptedPassword;
@@ -79,6 +80,16 @@ public class UserServicesTest {
         when(userRepository.alreadyExists(johnDoe())).thenThrow(new UserExistentException());
 
         userServices.add(johnDoe());
+    }
+
+    @Test
+    public void addValidUser() {
+        when(userRepository.alreadyExists(johnDoe())).thenReturn(false);
+        when(userRepository.add(userEq(userWithEncryptedPassword(johnDoe()))))
+                .thenReturn(userWithIdAndCreatedAt(johnDoe(), 1L));
+
+        final User user = userServices.add(johnDoe());
+        assertThat(user.getId(), is(equalTo(1L)));
     }
 
     private void addUserWithInvalidField(final User user, final String expectedInvalidFieldName) {
