@@ -30,7 +30,7 @@ public class UserServicesImpl implements UserServices {
     }
 
     @Override
-    public User findById(final Long id) {
+    public User findById(Long id) {
         final User user = repository.findById(id);
         if (user == null) {
             throw new UserNotFoundException();
@@ -39,11 +39,19 @@ public class UserServicesImpl implements UserServices {
     }
 
     @Override
-    public void update(final User user) {
-        final User existentUser = findById(user.getId());
+    public void update(User user) {
+        User existentUser = findById(user.getId());
         user.setPassword(existentUser.getPassword());
 
         validateUser(user);
+
+        repository.update(user);
+    }
+
+    @Override
+    public void updatePassword(Long id, String password) {
+        User user = findById(id);
+        user.setPassword(PasswordUtils.encryptPassword(password));
 
         repository.update(user);
     }

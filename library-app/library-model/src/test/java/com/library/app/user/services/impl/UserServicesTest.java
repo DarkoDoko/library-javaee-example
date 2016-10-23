@@ -1,6 +1,7 @@
 package com.library.app.user.services.impl;
 
 import com.library.app.FieldNotValidException;
+import com.library.app.PasswordUtils;
 import static com.library.app.user.UserArgumentMatcher.userEq;
 import com.library.app.user.UserExistentException;
 import static com.library.app.user.UserForTestsRepository.johnDoe;
@@ -152,6 +153,25 @@ public class UserServicesTest {
         userServices.update(user);
 
         final User expectedUser = userWithIdAndCreatedAt(johnDoe(), 1L);
+        verify(userRepository).update(userEq(expectedUser));
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void updatePasswordUserNotFound() {
+        when(userRepository.findById(1L)).thenThrow(new UserNotFoundException());
+
+        userServices.updatePassword(1L, "123456");
+    }
+
+    @Test
+    public void updatePassword() throws Exception {
+        final User user = userWithIdAndCreatedAt(johnDoe(), 1L);
+        when(userRepository.findById(1L)).thenReturn(user);
+
+        userServices.updatePassword(1L, "654654");
+
+        final User expectedUser = userWithIdAndCreatedAt(johnDoe(), 1L);
+        expectedUser.setPassword(PasswordUtils.encryptPassword("654654"));
         verify(userRepository).update(userEq(expectedUser));
     }
 

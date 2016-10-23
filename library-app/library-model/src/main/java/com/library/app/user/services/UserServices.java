@@ -15,4 +15,6 @@ public interface UserServices {
     
     void update(User user) throws FieldNotValidException, UserExistentException, UserNotFoundException;
     
+    void updatePassword(Long id, String password) throws UserNotFoundException;
+    
 }
