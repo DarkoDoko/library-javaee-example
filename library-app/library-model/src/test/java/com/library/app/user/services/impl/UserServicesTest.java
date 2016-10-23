@@ -2,6 +2,7 @@ package com.library.app.user.services.impl;
 
 import com.library.app.FieldNotValidException;
 import com.library.app.PasswordUtils;
+import com.library.app.pagination.PaginatedData;
 import static com.library.app.user.UserArgumentMatcher.userEq;
 import com.library.app.user.UserExistentException;
 import static com.library.app.user.UserForTestsRepository.johnDoe;
@@ -9,8 +10,10 @@ import static com.library.app.user.UserForTestsRepository.userWithEncryptedPassw
 import static com.library.app.user.UserForTestsRepository.userWithIdAndCreatedAt;
 import com.library.app.user.UserNotFoundException;
 import com.library.app.user.model.User;
+import com.library.app.user.model.filter.UserFilter;
 import com.library.app.user.repository.UserRepository;
 import com.library.app.user.services.UserServices;
+import java.util.Arrays;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -20,6 +23,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
+import static org.mockito.Matchers.anyObject;
 import org.mockito.Mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -224,6 +228,17 @@ public class UserServicesTest {
         user = userServices.findByEmailAndPassword(user.getEmail(), user.getPassword());
         assertThat(user, is(notNullValue()));
         assertThat(user.getName(), is(equalTo(johnDoe().getName())));
+    }
+
+    @Test
+    public void findUserByFilter() {
+        final PaginatedData<User> users = new PaginatedData<>(1,
+                Arrays.asList(userWithIdAndCreatedAt(johnDoe(), 1L)));
+        when(userRepository.findByFilter((UserFilter) anyObject())).thenReturn(users);
+
+        final PaginatedData<User> usersReturned = userServices.findByFilter(new UserFilter());
+        assertThat(usersReturned.getNumberOfRows(), is(equalTo(1)));
+        assertThat(usersReturned.getRow(0).getName(), is(equalTo(johnDoe().getName())));
     }
 
     private void addUserWithInvalidField(final User user, final String expectedInvalidFieldName) {

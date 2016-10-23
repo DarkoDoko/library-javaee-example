@@ -1,9 +1,11 @@
 package com.library.app.user.services;
 
 import com.library.app.FieldNotValidException;
+import com.library.app.pagination.PaginatedData;
 import com.library.app.user.UserExistentException;
 import com.library.app.user.UserNotFoundException;
 import com.library.app.user.model.User;
+import com.library.app.user.model.filter.UserFilter;
 import javax.ejb.Local;
 
 @Local
@@ -20,5 +22,7 @@ public interface UserServices {
     User findByEmail(String email) throws UserNotFoundException;
     
     User findByEmailAndPassword(String email, String password) throws UserNotFoundException;
+    
+    PaginatedData<User> findByFilter(UserFilter userFilter);
     
 }

@@ -3,9 +3,11 @@ package com.library.app.user.services.impl;
 import com.library.app.FieldNotValidException;
 import com.library.app.PasswordUtils;
 import com.library.app.ValidationUtils;
+import com.library.app.pagination.PaginatedData;
 import com.library.app.user.UserExistentException;
 import com.library.app.user.UserNotFoundException;
 import com.library.app.user.model.User;
+import com.library.app.user.model.filter.UserFilter;
 import com.library.app.user.repository.UserRepository;
 import com.library.app.user.services.UserServices;
 import javax.ejb.Stateless;
@@ -74,6 +76,11 @@ public class UserServicesImpl implements UserServices {
         }
 
         return user;
+    }
+
+    @Override
+    public PaginatedData<User> findByFilter(final UserFilter userFilter) {
+        return repository.findByFilter(userFilter);
     }
 
     private void validateUser(User user) throws FieldNotValidException {
