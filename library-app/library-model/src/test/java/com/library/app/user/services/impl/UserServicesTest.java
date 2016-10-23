@@ -1,7 +1,10 @@
 package com.library.app.user.services.impl;
 
 import com.library.app.FieldNotValidException;
+import com.library.app.user.UserExistentException;
 import static com.library.app.user.UserForTestsRepository.johnDoe;
+import static com.library.app.user.UserForTestsRepository.userWithEncryptedPassword;
+import static com.library.app.user.UserForTestsRepository.userWithIdAndCreatedAt;
 import com.library.app.user.model.User;
 import com.library.app.user.repository.UserRepository;
 import com.library.app.user.services.UserServices;
@@ -14,6 +17,7 @@ import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 
 public class UserServicesTest {
@@ -40,6 +44,41 @@ public class UserServicesTest {
         User user = johnDoe();
         user.setName(null);
         addUserWithInvalidField(user, "name");
+    }
+
+    @Test
+    public void addUserWithShortName() {
+        final User user = johnDoe();
+        user.setName("Jo");
+        addUserWithInvalidField(user, "name");
+    }
+
+    @Test
+    public void addUserWithNullEmail() {
+        final User user = johnDoe();
+        user.setEmail(null);
+        addUserWithInvalidField(user, "email");
+    }
+
+    @Test
+    public void addUserWithInvalidEmail() {
+        final User user = johnDoe();
+        user.setEmail("invalidemail");
+        addUserWithInvalidField(user, "email");
+    }
+
+    @Test
+    public void addUserWithNullPassword() {
+        final User user = johnDoe();
+        user.setPassword(null);
+        addUserWithInvalidField(user, "password");
+    }
+
+    @Test(expected = UserExistentException.class)
+    public void addExistentUser() {
+        when(userRepository.alreadyExists(johnDoe())).thenThrow(new UserExistentException());
+
+        userServices.add(johnDoe());
     }
 
     private void addUserWithInvalidField(final User user, final String expectedInvalidFieldName) {
