@@ -6,6 +6,7 @@ import com.library.app.user.UserExistentException;
 import static com.library.app.user.UserForTestsRepository.johnDoe;
 import static com.library.app.user.UserForTestsRepository.userWithEncryptedPassword;
 import static com.library.app.user.UserForTestsRepository.userWithIdAndCreatedAt;
+import com.library.app.user.UserNotFoundException;
 import com.library.app.user.model.User;
 import com.library.app.user.repository.UserRepository;
 import com.library.app.user.services.UserServices;
@@ -13,6 +14,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import org.junit.Before;
@@ -90,6 +92,22 @@ public class UserServicesTest {
 
         final User user = userServices.add(johnDoe());
         assertThat(user.getId(), is(equalTo(1L)));
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void findUserByIdNotFound() {
+        when(userRepository.findById(1L)).thenReturn(null);
+
+        userServices.findById(1L);
+    }
+
+    @Test
+    public void findUserById() {
+        when(userRepository.findById(1L)).thenReturn(userWithIdAndCreatedAt(johnDoe(), 1L));
+
+        final User user = userServices.findById(1L);
+        assertThat(user, is(notNullValue()));
+        assertThat(user.getName(), is(equalTo(johnDoe().getName())));
     }
 
     private void addUserWithInvalidField(final User user, final String expectedInvalidFieldName) {
