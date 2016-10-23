@@ -13,4 +13,6 @@ public interface UserServices {
     
     User findById(Long id) throws UserNotFoundException;
     
+    void update(User user) throws FieldNotValidException, UserExistentException, UserNotFoundException;
+    
 }

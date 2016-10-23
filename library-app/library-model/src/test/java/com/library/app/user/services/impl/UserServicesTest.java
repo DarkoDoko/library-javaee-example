@@ -20,6 +20,7 @@ import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 
@@ -108,6 +109,50 @@ public class UserServicesTest {
         final User user = userServices.findById(1L);
         assertThat(user, is(notNullValue()));
         assertThat(user.getName(), is(equalTo(johnDoe().getName())));
+    }
+
+    @Test
+    public void updateUserWithNullName() {
+        when(userRepository.findById(1L)).thenReturn(userWithIdAndCreatedAt(johnDoe(), 1L));
+
+        final User user = userWithIdAndCreatedAt(johnDoe(), 1L);
+        user.setName(null);
+
+        try {
+            userServices.update(user);
+        } catch (final FieldNotValidException e) {
+            assertThat(e.getFieldName(), is(equalTo("name")));
+        }
+    }
+
+    @Test(expected = UserExistentException.class)
+    public void updateUserExistent() throws Exception {
+        when(userRepository.findById(1L)).thenReturn(userWithIdAndCreatedAt(johnDoe(), 1L));
+
+        final User user = userWithIdAndCreatedAt(johnDoe(), 1L);
+        when(userRepository.alreadyExists(user)).thenReturn(true);
+
+        userServices.update(user);
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void updateUserNotFound() throws Exception {
+        final User user = userWithIdAndCreatedAt(johnDoe(), 1L);
+        when(userRepository.findById(1L)).thenReturn(null);
+
+        userServices.update(user);
+    }
+
+    @Test
+    public void updateValidUser() throws Exception {
+        final User user = userWithIdAndCreatedAt(johnDoe(), 1L);
+        user.setPassword(null);
+        when(userRepository.findById(1L)).thenReturn(userWithIdAndCreatedAt(johnDoe(), 1L));
+
+        userServices.update(user);
+
+        final User expectedUser = userWithIdAndCreatedAt(johnDoe(), 1L);
+        verify(userRepository).update(userEq(expectedUser));
     }
 
     private void addUserWithInvalidField(final User user, final String expectedInvalidFieldName) {

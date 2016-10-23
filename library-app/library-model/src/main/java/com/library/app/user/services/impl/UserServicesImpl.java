@@ -29,14 +29,6 @@ public class UserServicesImpl implements UserServices {
         return repository.add(user);
     }
 
-    private void validateUser(User user) throws FieldNotValidException {
-        if (repository.alreadyExists(user)) {
-            throw new UserExistentException();
-        }
-
-        ValidationUtils.validateEntityFields(validator, user);
-    }
-
     @Override
     public User findById(final Long id) {
         final User user = repository.findById(id);
@@ -44,6 +36,24 @@ public class UserServicesImpl implements UserServices {
             throw new UserNotFoundException();
         }
         return user;
+    }
+
+    @Override
+    public void update(final User user) {
+        final User existentUser = findById(user.getId());
+        user.setPassword(existentUser.getPassword());
+
+        validateUser(user);
+
+        repository.update(user);
+    }
+
+    private void validateUser(User user) throws FieldNotValidException {
+        if (repository.alreadyExists(user)) {
+            throw new UserExistentException();
+        }
+
+        ValidationUtils.validateEntityFields(validator, user);
     }
 
 }
