@@ -140,6 +140,36 @@ public class UserRepositoryTest extends TestBaseRepository {
         assertThat(result.getRow(0).getName(), is(equalTo(admin().getName())));
     }
 
+    @Test
+    public void findByFilterFilteringByName() {
+        loadDataForFindByFilter();
+
+        UserFilter userFilter = new UserFilter();
+        userFilter.setName("m");
+        userFilter.setPaginationData(new PaginationData(0, 2, "name", OrderMode.ASCENDING));
+
+        PaginatedData<User> result = repositoryUnderTest.findByFilter(userFilter);
+        assertThat(result.getNumberOfRows(), is(equalTo(2)));
+        assertThat(result.getRows().size(), is(equalTo(2)));
+        assertThat(result.getRow(0).getName(), is(equalTo(admin().getName())));
+        assertThat(result.getRow(1).getName(), is(equalTo(mary().getName())));
+    }
+
+    @Test
+    public void findByFilterFilteringByNameAndType() {
+        loadDataForFindByFilter();
+
+        UserFilter userFilter = new UserFilter();
+        userFilter.setName("m");
+        userFilter.setUserType(UserType.EMPLOYEE);
+        userFilter.setPaginationData(new PaginationData(0, 2, "name", OrderMode.ASCENDING));
+
+        PaginatedData<User> result = repositoryUnderTest.findByFilter(userFilter);
+        assertThat(result.getNumberOfRows(), is(equalTo(1)));
+        assertThat(result.getRows().size(), is(equalTo(1)));
+        assertThat(result.getRow(0).getName(), is(equalTo(admin().getName())));
+    }
+    
     private void loadDataForFindByFilter() {
         dbExecutor.executeCommand(() -> {
             allUsers().forEach(repositoryUnderTest::add);
