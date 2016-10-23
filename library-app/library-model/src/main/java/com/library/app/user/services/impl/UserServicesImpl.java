@@ -65,6 +65,17 @@ public class UserServicesImpl implements UserServices {
         return user;
     }
 
+    @Override
+    public User findByEmailAndPassword(final String email, final String password) {
+        final User user = findByEmail(email);
+
+        if (!user.getPassword().equals(PasswordUtils.encryptPassword(password))) {
+            throw new UserNotFoundException();
+        }
+
+        return user;
+    }
+
     private void validateUser(User user) throws FieldNotValidException {
         if (repository.alreadyExists(user)) {
             throw new UserExistentException();

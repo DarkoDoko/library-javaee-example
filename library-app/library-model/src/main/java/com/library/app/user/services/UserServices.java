@@ -19,4 +19,6 @@ public interface UserServices {
     
     User findByEmail(String email) throws UserNotFoundException;
     
+    User findByEmailAndPassword(String email, String password) throws UserNotFoundException;
+    
 }

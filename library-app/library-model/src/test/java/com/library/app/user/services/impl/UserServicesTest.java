@@ -191,6 +191,41 @@ public class UserServicesTest {
         assertThat(user.getName(), is(equalTo(johnDoe().getName())));
     }
 
+    @Test(expected = UserNotFoundException.class)
+    public void findUserByEmailAndPasswordNotFound() {
+        final User user = johnDoe();
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(null);
+
+        userServices.findByEmailAndPassword(user.getEmail(), user.getPassword());
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void findUserByAndPasswordEmailWithInvalidPassword() throws UserNotFoundException {
+        final User user = johnDoe();
+        user.setPassword("1111");
+
+        User userReturned = userWithIdAndCreatedAt(johnDoe(), 1L);
+        userReturned = userWithEncryptedPassword(userReturned);
+
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(userReturned);
+
+        userServices.findByEmailAndPassword(user.getEmail(), user.getPassword());
+    }
+
+    @Test
+    public void findUserByAndPasswordEmail() throws UserNotFoundException {
+        User user = johnDoe();
+
+        User userReturned = userWithIdAndCreatedAt(johnDoe(), 1L);
+        userReturned = userWithEncryptedPassword(userReturned);
+
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(userReturned);
+
+        user = userServices.findByEmailAndPassword(user.getEmail(), user.getPassword());
+        assertThat(user, is(notNullValue()));
+        assertThat(user.getName(), is(equalTo(johnDoe().getName())));
+    }
+
     private void addUserWithInvalidField(final User user, final String expectedInvalidFieldName) {
         try {
             userServices.add(user);
