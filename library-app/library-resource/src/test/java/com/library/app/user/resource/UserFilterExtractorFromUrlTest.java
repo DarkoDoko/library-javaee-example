@@ -37,6 +37,42 @@ public class UserFilterExtractorFromUrlTest {
         assertFieldsOnFilter(userFilter, null, null);
     }
 
+    @Test
+    public void withPaginationAndNameAndUserTypeAndSortAscending() {
+        setUpUriInfo("2", "5", "John", UserType.CUSTOMER, "id");
+
+        UserFilterExtractorFromUrl extractor = new UserFilterExtractorFromUrl(uriInfo);
+        UserFilter userFilter = extractor.getFilter();
+
+        assertActualPaginationDataWithExpected(userFilter.getPaginationData(), new PaginationData(10, 5, "id",
+            OrderMode.ASCENDING));
+        assertFieldsOnFilter(userFilter, "John", UserType.CUSTOMER);
+    }
+
+    @Test
+    public void withPaginationAndNameAndSortAscendingWithPrefix() {
+        setUpUriInfo("2", "5", "John", null, "+id");
+
+        UserFilterExtractorFromUrl extractor = new UserFilterExtractorFromUrl(uriInfo);
+        UserFilter userFilter = extractor.getFilter();
+
+        assertActualPaginationDataWithExpected(userFilter.getPaginationData(), new PaginationData(10, 5, "id",
+            OrderMode.ASCENDING));
+        assertFieldsOnFilter(userFilter, "John", null);
+    }
+
+    @Test
+    public void withPaginationAndNameeAndUserTypeAndSortDescending() {
+        setUpUriInfo("2", "5", "John", UserType.EMPLOYEE, "-id");
+
+        UserFilterExtractorFromUrl extractor = new UserFilterExtractorFromUrl(uriInfo);
+        UserFilter userFilter = extractor.getFilter();
+
+        assertActualPaginationDataWithExpected(userFilter.getPaginationData(), new PaginationData(10, 5, "id",
+            OrderMode.DESCENDING));
+        assertFieldsOnFilter(userFilter, "John", UserType.EMPLOYEE);
+    }
+
     private void setUpUriInfo(String page, String perPage, String name, UserType type, String sort) {
         Map<String, String> parameters = new LinkedHashMap<>();
         parameters.put("page", page);
