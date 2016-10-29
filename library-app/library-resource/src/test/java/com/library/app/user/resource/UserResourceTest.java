@@ -4,21 +4,26 @@ import com.library.app.FieldNotValidException;
 import com.library.app.common.model.HttpCode;
 import static com.library.app.commontests.utils.FileTestNameUtils.getPathFileRequest;
 import static com.library.app.commontests.utils.FileTestNameUtils.getPathFileResponse;
-import com.library.app.commontests.utils.JsonTestUtils;
 import static com.library.app.commontests.utils.JsonTestUtils.assertJsonMatchesExpectedJson;
 import static com.library.app.commontests.utils.JsonTestUtils.assertJsonMatchesFileContent;
 import static com.library.app.commontests.utils.JsonTestUtils.readJsonFile;
+import com.library.app.pagination.PaginatedData;
 import static com.library.app.user.UserArgumentMatcher.userEq;
 import com.library.app.user.UserExistentException;
 import static com.library.app.user.UserForTestsRepository.admin;
+import static com.library.app.user.UserForTestsRepository.allUsers;
 import static com.library.app.user.UserForTestsRepository.johnDoe;
 import static com.library.app.user.UserForTestsRepository.mary;
 import static com.library.app.user.UserForTestsRepository.userWithIdAndCreatedAt;
 import com.library.app.user.UserNotFoundException;
 import com.library.app.user.model.User;
 import com.library.app.user.model.User.Roles;
+import com.library.app.user.model.filter.UserFilter;
 import com.library.app.user.services.UserServices;
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
@@ -124,7 +129,7 @@ public class UserResourceTest {
 
         final Response response = resourceUnderTest.update(1L,
             readJsonFile(getPathFileRequest(PATH_RESOURCE, "updateCustomerJohnDoe.json")));
-        
+
         assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
         assertThat(response.getEntity().toString(), is(equalTo("")));
 
@@ -140,7 +145,7 @@ public class UserResourceTest {
 
         final Response response = resourceUnderTest.update(1L,
             readJsonFile(getPathFileRequest(PATH_RESOURCE, "updateCustomerJohnDoe.json")));
-        
+
         assertThat(response.getStatus(), is(equalTo(HttpCode.FORBIDDEN.getCode())));
     }
 
@@ -150,7 +155,7 @@ public class UserResourceTest {
 
         final Response response = resourceUnderTest.update(1L,
             readJsonFile(getPathFileRequest(PATH_RESOURCE, "updateEmployeeAdmin.json")));
-        
+
         assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
         assertThat(response.getEntity().toString(), is(equalTo("")));
 
@@ -166,7 +171,7 @@ public class UserResourceTest {
 
         final Response response = resourceUnderTest.update(1L,
             readJsonFile(getPathFileRequest(PATH_RESOURCE, "updateCustomerJohnDoe.json")));
-        
+
         assertThat(response.getStatus(), is(equalTo(HttpCode.VALIDATION_ERROR.getCode())));
         assertJsonResponseWithFile(response, "userAlreadyExists.json");
     }
@@ -180,7 +185,7 @@ public class UserResourceTest {
 
         final Response response = resourceUnderTest.update(1L,
             readJsonFile(getPathFileRequest(PATH_RESOURCE, "customerWithNullName.json")));
-        
+
         assertThat(response.getStatus(), is(equalTo(HttpCode.VALIDATION_ERROR.getCode())));
         assertJsonResponseWithFile(response, "userErrorNullName.json");
     }
@@ -192,7 +197,7 @@ public class UserResourceTest {
 
         final Response response = resourceUnderTest.update(2L,
             readJsonFile(getPathFileRequest(PATH_RESOURCE, "updateCustomerJohnDoe.json")));
-        
+
         assertThat(response.getStatus(), is(equalTo(HttpCode.NOT_FOUND.getCode())));
     }
 
@@ -201,7 +206,7 @@ public class UserResourceTest {
         when(securityContext.isUserInRole(Roles.ADMINISTRATOR.name())).thenReturn(true);
 
         final Response response = resourceUnderTest.updatePassword(1L, getJsonWithPassword("123456"));
-        
+
         assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
         assertThat(response.getEntity().toString(), is(equalTo("")));
         verify(servicesCollaborator).updatePassword(1L, "123456");
@@ -213,7 +218,7 @@ public class UserResourceTest {
         when(securityContext.isUserInRole(Roles.ADMINISTRATOR.name())).thenReturn(false);
 
         final Response response = resourceUnderTest.updatePassword(1L, getJsonWithPassword("123456"));
-        
+
         assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
         assertThat(response.getEntity().toString(), is(equalTo("")));
         verify(servicesCollaborator).updatePassword(1L, "123456");
@@ -226,6 +231,67 @@ public class UserResourceTest {
 
         Response response = resourceUnderTest.updatePassword(1L, getJsonWithPassword("123456"));
         assertThat(response.getStatus(), is(equalTo(HttpCode.FORBIDDEN.getCode())));
+    }
+
+    @Test
+    public void findCustomerById() {
+        when(servicesCollaborator.findById(1L)).thenReturn(userWithIdAndCreatedAt(johnDoe(), 1L));
+
+        Response response = resourceUnderTest.findById(1L);
+        
+        assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
+        assertJsonResponseWithFile(response, "customerJohnDoeFound.json");
+    }
+
+    @Test
+    public void findUserByIdNotFound() {
+        when(servicesCollaborator.findById(1L)).thenThrow(new UserNotFoundException());
+
+        Response response = resourceUnderTest.findById(1L);
+        
+        assertThat(response.getStatus(), is(equalTo(HttpCode.NOT_FOUND.getCode())));
+    }
+
+    @Test
+    public void findEmployeeByEmailAndPassword() {
+        when(servicesCollaborator.findByEmailAndPassword(admin().getEmail(), admin().getPassword())).
+        thenReturn(userWithIdAndCreatedAt(admin(), 1L));
+
+        Response response = resourceUnderTest.findByEmailAndPassword(
+            getJsonWithEmailAndPassword(admin().getEmail(), admin().getPassword()));
+        
+        assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
+        assertJsonResponseWithFile(response, "employeeAdminFound.json");
+    }
+
+    @Test
+    public void findUserByEmailAndPasswordNotFound() {
+        when(servicesCollaborator.findByEmailAndPassword(admin().getEmail(), admin().getPassword())).
+        thenThrow(new UserNotFoundException());
+
+        Response response = resourceUnderTest.findByEmailAndPassword(
+            getJsonWithEmailAndPassword(admin().getEmail(), admin().getPassword()));
+        
+        assertThat(response.getStatus(), is(equalTo(HttpCode.NOT_FOUND.getCode())));
+    }
+
+    @Test
+    public void findByFilterNoFilter() {
+        List<User> users = new ArrayList<>();
+        List<User> allUsers = allUsers();
+        for (int i = 1; i <= allUsers.size(); i++) {
+            users.add(userWithIdAndCreatedAt(allUsers.get(i - 1), new Long(i)));
+        }
+
+        MultivaluedMap<String, String> multiMap = mock(MultivaluedMap.class);
+        when(info.getQueryParameters()).thenReturn(multiMap);
+
+        when(servicesCollaborator.findByFilter((UserFilter) anyObject())).thenReturn(
+            new PaginatedData<>(users.size(), users));
+
+        final Response response = resourceUnderTest.findByFilter();
+        assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
+        assertJsonResponseWithFile(response, "usersAllInOnePage.json");
     }
 
     private static String getJsonWithPassword(String password) {
