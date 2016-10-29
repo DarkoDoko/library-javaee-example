@@ -24,47 +24,53 @@ import org.mockito.MockitoAnnotations;
 public class UserResourceTest {
 
     private static final String PATH_RESOURCE = "users";
-    
+
     private UserResource resourceUnderTest;
-    
+
     @Mock
     private UserServices servicesCollaborator;
-    
+
     @Mock
     private UriInfo info;
-    
+
     @Mock
     private SecurityContext securityContext;
-    
+
     @Before
     public void initTestCase() {
         MockitoAnnotations.initMocks(this);
-        
+
         resourceUnderTest = new UserResource();
         resourceUnderTest.services = servicesCollaborator;
         resourceUnderTest.jsonConverter = new UserJsonConverter();
         resourceUnderTest.uriInfo = info;
         resourceUnderTest.securityContext = securityContext;
     }
-    
+
     @Test
     public void addValidCustomer() {
         when(servicesCollaborator.add(userEq(johnDoe()))).
             thenReturn(userWithIdAndCreatedAt(johnDoe(), 1L));
-        
-        Response response = resourceUnderTest.add(
-                                            readJsonFile(
-                                            getPathFileRequest(PATH_RESOURCE, "customerJohnDoe.json")));
-        
+
+        Response response = resourceUnderTest.add(readJsonFile(
+                getPathFileRequest(PATH_RESOURCE, "customerJohnDoe.json")));
+
         assertThat(response.getStatus(), is(equalTo(HttpCode.CREATED.getCode())));
         assertJsonMatchesExpectedJson(response.getEntity().toString(), "{\"id\": 1}");
     }
 
-    private static String getJsonWithPassword(final String password) {
-		return String.format("{\"password\":\"%s\"}", password);
-	}
+    @Test
+    public void addValidEmployee() {
+        final Response response = resourceUnderTest.add(
+                readJsonFile(getPathFileRequest(PATH_RESOURCE, "employeeAdmin.json")));
+        assertThat(response.getStatus(), is(equalTo(HttpCode.FORBIDDEN.getCode())));
+    }
 
-	private static String getJsonWithEmailAndPassword(final String email, final String password) {
-		return String.format("{\"email\":\"%s\",\"password\":\"%s\"}", email, password);
-	}    
+    private static String getJsonWithPassword(final String password) {
+        return String.format("{\"password\":\"%s\"}", password);
+    }
+
+    private static String getJsonWithEmailAndPassword(final String email, final String password) {
+        return String.format("{\"email\":\"%s\",\"password\":\"%s\"}", email, password);
+    }
 }

@@ -6,6 +6,7 @@ import com.library.app.common.model.ResourceMessage;
 import com.library.app.json.JsonUtils;
 import com.library.app.json.OperationResultJsonWriter;
 import com.library.app.user.model.User;
+import com.library.app.user.model.User.UserType;
 import com.library.app.user.services.UserServices;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -46,6 +47,10 @@ public class UserResource {
         logger.debug("Adding a new user with body {}", body);
         
         User user = jsonConverter.convertFrom(body);
+        
+        if(user.getUserType().equals(UserType.EMPLOYEE)) {
+            return Response.status(HttpCode.FORBIDDEN.getCode()).build();
+        }
         
         user = services.add(user);
         OperationResult result = OperationResult.success(JsonUtils.getJsonElementWithId(user.getId()));
