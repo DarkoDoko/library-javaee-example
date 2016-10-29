@@ -1,6 +1,6 @@
 {
     "id": 1,
-    "name": "John doe",
+    "name": "John Doe",
     "email": "john@domain.com",
     "type": "CUSTOMER",
     "roles": [

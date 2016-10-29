@@ -10,10 +10,15 @@ import static com.library.app.commontests.utils.JsonTestUtils.assertJsonMatchesF
 import static com.library.app.commontests.utils.JsonTestUtils.readJsonFile;
 import static com.library.app.user.UserArgumentMatcher.userEq;
 import com.library.app.user.UserExistentException;
+import static com.library.app.user.UserForTestsRepository.admin;
 import static com.library.app.user.UserForTestsRepository.johnDoe;
+import static com.library.app.user.UserForTestsRepository.mary;
 import static com.library.app.user.UserForTestsRepository.userWithIdAndCreatedAt;
+import com.library.app.user.UserNotFoundException;
 import com.library.app.user.model.User;
+import com.library.app.user.model.User.Roles;
 import com.library.app.user.services.UserServices;
+import java.security.Principal;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
@@ -24,6 +29,9 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.mockito.Matchers.anyObject;
 import org.mockito.Mock;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 
@@ -89,9 +97,135 @@ public class UserResourceTest {
 
         final Response response = resourceUnderTest.add(readJsonFile(
             getPathFileRequest(PATH_RESOURCE, "customerWithNullName.json")));
+
+        assertThat(response.getStatus(), is(equalTo(HttpCode.VALIDATION_ERROR.getCode())));
+        assertJsonResponseWithFile(response, "userErrorNullName.json");
+    }
+
+    @Test
+    public void updateValidCustomer() {
+        when(securityContext.isUserInRole(Roles.ADMINISTRATOR.name())).thenReturn(true);
+
+        Response response = resourceUnderTest.update(1L, readJsonFile(
+            getPathFileRequest(PATH_RESOURCE, "updateCustomerJohnDoe.json")));
+
+        assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
+        assertThat(response.getEntity().toString(), is(equalTo("")));
+
+        User expectedUser = userWithIdAndCreatedAt(johnDoe(), 1L);
+        expectedUser.setPassword(null);
+        verify(servicesCollaborator).update(userEq(expectedUser));
+    }
+
+    @Test
+    public void updateValidCustomerLoggedAsCustomerToBeUpdated() {
+        setUpPrincipalUser(userWithIdAndCreatedAt(johnDoe(), 1L));
+        when(securityContext.isUserInRole(Roles.ADMINISTRATOR.name())).thenReturn(false);
+
+        final Response response = resourceUnderTest.update(1L,
+            readJsonFile(getPathFileRequest(PATH_RESOURCE, "updateCustomerJohnDoe.json")));
+        
+        assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
+        assertThat(response.getEntity().toString(), is(equalTo("")));
+
+        User expectedUser = userWithIdAndCreatedAt(johnDoe(), 1L);
+        expectedUser.setPassword(null);
+        verify(servicesCollaborator).update(userEq(expectedUser));
+    }
+
+    @Test
+    public void updateValidCustomerLoggedAsOtherCustomer() {
+        setUpPrincipalUser(userWithIdAndCreatedAt(mary(), 2L));
+        when(securityContext.isUserInRole(Roles.ADMINISTRATOR.name())).thenReturn(false);
+
+        final Response response = resourceUnderTest.update(1L,
+            readJsonFile(getPathFileRequest(PATH_RESOURCE, "updateCustomerJohnDoe.json")));
+        
+        assertThat(response.getStatus(), is(equalTo(HttpCode.FORBIDDEN.getCode())));
+    }
+
+    @Test
+    public void updateValidEmployee() {
+        when(securityContext.isUserInRole(Roles.ADMINISTRATOR.name())).thenReturn(true);
+
+        final Response response = resourceUnderTest.update(1L,
+            readJsonFile(getPathFileRequest(PATH_RESOURCE, "updateEmployeeAdmin.json")));
+        
+        assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
+        assertThat(response.getEntity().toString(), is(equalTo("")));
+
+        User expectedUser = userWithIdAndCreatedAt(admin(), 1L);
+        expectedUser.setPassword(null);
+        verify(servicesCollaborator).update(userEq(expectedUser));
+    }
+
+    @Test
+    public void updateUserWithEmailBelongingToOtherUser() {
+        when(securityContext.isUserInRole(Roles.ADMINISTRATOR.name())).thenReturn(true);
+        doThrow(new UserExistentException()).when(servicesCollaborator).update(userWithIdAndCreatedAt(johnDoe(), 1L));
+
+        final Response response = resourceUnderTest.update(1L,
+            readJsonFile(getPathFileRequest(PATH_RESOURCE, "updateCustomerJohnDoe.json")));
+        
+        assertThat(response.getStatus(), is(equalTo(HttpCode.VALIDATION_ERROR.getCode())));
+        assertJsonResponseWithFile(response, "userAlreadyExists.json");
+    }
+
+    @Test
+    public void updateUserWithNullName() {
+        when(securityContext.isUserInRole(Roles.ADMINISTRATOR.name())).thenReturn(true);
+
+        doThrow(new FieldNotValidException("name", "may not be null")).when(servicesCollaborator).update(
+            userWithIdAndCreatedAt(johnDoe(), 1L));
+
+        final Response response = resourceUnderTest.update(1L,
+            readJsonFile(getPathFileRequest(PATH_RESOURCE, "customerWithNullName.json")));
         
         assertThat(response.getStatus(), is(equalTo(HttpCode.VALIDATION_ERROR.getCode())));
         assertJsonResponseWithFile(response, "userErrorNullName.json");
+    }
+
+    @Test
+    public void updateUserNotFound() {
+        when(securityContext.isUserInRole(Roles.ADMINISTRATOR.name())).thenReturn(true);
+        doThrow(new UserNotFoundException()).when(servicesCollaborator).update(userWithIdAndCreatedAt(johnDoe(), 2L));
+
+        final Response response = resourceUnderTest.update(2L,
+            readJsonFile(getPathFileRequest(PATH_RESOURCE, "updateCustomerJohnDoe.json")));
+        
+        assertThat(response.getStatus(), is(equalTo(HttpCode.NOT_FOUND.getCode())));
+    }
+
+    @Test
+    public void updateUserPassword() {
+        when(securityContext.isUserInRole(Roles.ADMINISTRATOR.name())).thenReturn(true);
+
+        final Response response = resourceUnderTest.updatePassword(1L, getJsonWithPassword("123456"));
+        
+        assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
+        assertThat(response.getEntity().toString(), is(equalTo("")));
+        verify(servicesCollaborator).updatePassword(1L, "123456");
+    }
+
+    @Test
+    public void updateCustomerPasswordLoggedAsCustomerToBeUpdated() {
+        setUpPrincipalUser(userWithIdAndCreatedAt(johnDoe(), 1L));
+        when(securityContext.isUserInRole(Roles.ADMINISTRATOR.name())).thenReturn(false);
+
+        final Response response = resourceUnderTest.updatePassword(1L, getJsonWithPassword("123456"));
+        
+        assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
+        assertThat(response.getEntity().toString(), is(equalTo("")));
+        verify(servicesCollaborator).updatePassword(1L, "123456");
+    }
+
+    @Test
+    public void updateCustomerPasswordLoggedAsOtherCustomer() {
+        setUpPrincipalUser(userWithIdAndCreatedAt(mary(), 2L));
+        when(securityContext.isUserInRole(Roles.ADMINISTRATOR.name())).thenReturn(false);
+
+        Response response = resourceUnderTest.updatePassword(1L, getJsonWithPassword("123456"));
+        assertThat(response.getStatus(), is(equalTo(HttpCode.FORBIDDEN.getCode())));
     }
 
     private static String getJsonWithPassword(String password) {
@@ -104,5 +238,13 @@ public class UserResourceTest {
 
     private void assertJsonResponseWithFile(Response response, String fileName) {
         assertJsonMatchesFileContent(response.getEntity().toString(), getPathFileResponse(PATH_RESOURCE, fileName));
+    }
+
+    private void setUpPrincipalUser(User user) {
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn(user.getEmail());
+
+        when(securityContext.getUserPrincipal()).thenReturn(principal);
+        when(servicesCollaborator.findByEmail(user.getEmail())).thenReturn(user);
     }
 }
