@@ -1,10 +1,12 @@
 package com.library.app.user.resource;
 
+import com.library.app.FieldNotValidException;
 import com.library.app.common.model.HttpCode;
 import com.library.app.common.model.OperationResult;
 import com.library.app.common.model.ResourceMessage;
 import com.library.app.common.model.StandardsOperationResults;
 import static com.library.app.common.model.StandardsOperationResults.getOperationResultExistent;
+import static com.library.app.common.model.StandardsOperationResults.getOperationResultInvalidField;
 import com.library.app.json.JsonUtils;
 import com.library.app.json.OperationResultJsonWriter;
 import com.library.app.user.UserExistentException;
@@ -60,13 +62,17 @@ public class UserResource {
         try {
             user = services.add(user);
             result = OperationResult.success(JsonUtils.getJsonElementWithId(user.getId()));
-        } catch( UserExistentException e) {
-            
+        } catch (UserExistentException e) {
+
             httpCode = HttpCode.VALIDATION_ERROR;
             logger.error("There is already an user for the given email", e);
             result = getOperationResultExistent(RESOURCE_MESSAGE, "email");
+        } catch (FieldNotValidException e) {
+            
+            httpCode = HttpCode.VALIDATION_ERROR;
+            logger.error("One of the fields of the user is not valid", e);
+            result = getOperationResultInvalidField(RESOURCE_MESSAGE, e);
         }
-
         logger.debug("Returning the operation result after adding user: {}", result);
         return Response.
             status(httpCode.getCode()).

@@ -1,5 +1,6 @@
 package com.library.app.user.resource;
 
+import com.library.app.FieldNotValidException;
 import com.library.app.common.model.HttpCode;
 import static com.library.app.commontests.utils.FileTestNameUtils.getPathFileRequest;
 import static com.library.app.commontests.utils.FileTestNameUtils.getPathFileResponse;
@@ -11,6 +12,7 @@ import static com.library.app.user.UserArgumentMatcher.userEq;
 import com.library.app.user.UserExistentException;
 import static com.library.app.user.UserForTestsRepository.johnDoe;
 import static com.library.app.user.UserForTestsRepository.userWithIdAndCreatedAt;
+import com.library.app.user.model.User;
 import com.library.app.user.services.UserServices;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
@@ -20,6 +22,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
+import static org.mockito.Matchers.anyObject;
 import org.mockito.Mock;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
@@ -66,7 +69,7 @@ public class UserResourceTest {
     public void addValidEmployee() {
         Response response = resourceUnderTest.add(readJsonFile(
             getPathFileRequest(PATH_RESOURCE, "employeeAdmin.json")));
-        
+
         assertThat(response.getStatus(), is(equalTo(HttpCode.FORBIDDEN.getCode())));
     }
 
@@ -80,6 +83,17 @@ public class UserResourceTest {
         assertJsonResponseWithFile(response, "userAlreadyExists.json");
     }
 
+    @Test
+    public void addUserWithNullName() {
+        when(servicesCollaborator.add((User) anyObject())).thenThrow(new FieldNotValidException("name", "may not be null"));
+
+        final Response response = resourceUnderTest.add(readJsonFile(
+            getPathFileRequest(PATH_RESOURCE, "customerWithNullName.json")));
+        
+        assertThat(response.getStatus(), is(equalTo(HttpCode.VALIDATION_ERROR.getCode())));
+        assertJsonResponseWithFile(response, "userErrorNullName.json");
+    }
+
     private static String getJsonWithPassword(String password) {
         return String.format("{\"password\":\"%s\"}", password);
     }
@@ -87,8 +101,8 @@ public class UserResourceTest {
     private static String getJsonWithEmailAndPassword(String email, String password) {
         return String.format("{\"email\":\"%s\",\"password\":\"%s\"}", email, password);
     }
-    
+
     private void assertJsonResponseWithFile(Response response, String fileName) {
-		assertJsonMatchesFileContent(response.getEntity().toString(), getPathFileResponse(PATH_RESOURCE, fileName));
-	}
+        assertJsonMatchesFileContent(response.getEntity().toString(), getPathFileResponse(PATH_RESOURCE, fileName));
+    }
 }
