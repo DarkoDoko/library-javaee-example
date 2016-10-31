@@ -23,6 +23,8 @@ import com.library.app.user.model.User.Roles;
 import com.library.app.user.model.User.UserType;
 import com.library.app.user.model.filter.UserFilter;
 import com.library.app.user.services.UserServices;
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -96,6 +98,7 @@ public class UserResource {
 
     @PUT
     @Path("/{id}")
+    @PermitAll
     public Response update(@PathParam("id") Long id, String body) {
         logger.debug("Updating the user {} with body {}", id, body);
 
@@ -140,6 +143,7 @@ public class UserResource {
 
     @PUT
     @Path("/{id}/password")
+    @PermitAll
     public Response updatePassword(@PathParam("id") Long id, String body) {
         logger.debug("Updating the password for user {}", id);
 
@@ -164,6 +168,7 @@ public class UserResource {
 
     @GET
     @Path("/{id}")
+    @RolesAllowed({"ADMINISTRATOR"})
     public Response findById(@PathParam("id") Long id) {
         logger.debug("Find user by id: {}", id);
         ResponseBuilder responseBuilder;
@@ -184,6 +189,7 @@ public class UserResource {
 
     @POST
     @Path("/authenticate")
+    @PermitAll
     public Response findByEmailAndPassword(String body) {
         logger.debug("Find user by email and password");
         ResponseBuilder responseBuilder;
@@ -206,6 +212,7 @@ public class UserResource {
     }
 
     @GET
+    @RolesAllowed({"ADMINISTRATOR"})
     public Response findByFilter() {
         UserFilter userFilter = new UserFilterExtractorFromUrl(uriInfo).getFilter();
         logger.debug("Finding users using filter: {}", userFilter);
