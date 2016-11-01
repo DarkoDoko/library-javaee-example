@@ -23,6 +23,7 @@ import com.library.app.commontests.utils.IntTestUtils;
 import static com.library.app.commontests.utils.JsonTestUtils.assertJsonMatchesFileContent;
 import com.library.app.commontests.utils.ResourceClient;
 import com.library.app.json.JsonReader;
+import static com.library.app.user.UserForTestsRepository.admin;
 import java.net.URL;
 import javax.ws.rs.core.Response;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -56,6 +57,8 @@ public class AuthorResourceIntTest {
     public void initTestCase() {
         resourceClient = new ResourceClient(url);
         resourceClient.resourcePath("/DB").delete();
+        resourceClient.resourcePath("DB/users").postWithContent("");
+        resourceClient.user(admin());
     }
     
     @Test
