@@ -1,7 +1,7 @@
 package com.library.app.user.resource;
 
 import com.library.app.common.resource.AbstractFilterExtractorFromUrl;
-import com.library.app.user.model.User;
+import com.library.app.user.model.User.UserType;
 import com.library.app.user.model.filter.UserFilter;
 import javax.ws.rs.core.UriInfo;
 
@@ -18,7 +18,7 @@ public class UserFilterExtractorFromUrl extends AbstractFilterExtractorFromUrl {
         
         String userType = getUriInfo().getQueryParameters().getFirst("type");
         if(userType != null) {
-            filter.setUserType(User.UserType.valueOf(userType));
+            filter.setUserType(UserType.valueOf(userType));
         }
         
         return filter;
