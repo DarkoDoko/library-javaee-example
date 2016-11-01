@@ -6,7 +6,6 @@ import com.library.app.FieldNotValidException;
 import com.library.app.common.model.HttpCode;
 import com.library.app.common.model.OperationResult;
 import com.library.app.common.model.ResourceMessage;
-import com.library.app.common.model.StandardsOperationResults;
 import static com.library.app.common.model.StandardsOperationResults.getOperationResultExistent;
 import static com.library.app.common.model.StandardsOperationResults.getOperationResultInvalidField;
 import static com.library.app.common.model.StandardsOperationResults.getOperationResultNotFound;
@@ -78,13 +77,13 @@ public class UserResource {
         try {
             user = services.add(user);
             result = OperationResult.success(JsonUtils.getJsonElementWithId(user.getId()));
+            
         } catch (UserExistentException e) {
-
             httpCode = HttpCode.VALIDATION_ERROR;
             logger.error("There is already an user for the given email", e);
             result = getOperationResultExistent(RESOURCE_MESSAGE, "email");
+            
         } catch (FieldNotValidException e) {
-
             httpCode = HttpCode.VALIDATION_ERROR;
             logger.error("One of the fields of the user is not valid", e);
             result = getOperationResultInvalidField(RESOURCE_MESSAGE, e);
@@ -118,23 +117,19 @@ public class UserResource {
             result = OperationResult.success();
 
         } catch (final FieldNotValidException e) {
-
             httpCode = HttpCode.VALIDATION_ERROR;
             logger.error("One of the fields of the user is not valid", e);
             result = getOperationResultInvalidField(RESOURCE_MESSAGE, e);
 
         } catch (final UserExistentException e) {
-
             httpCode = HttpCode.VALIDATION_ERROR;
             logger.error("There is already an user for the given email", e);
             result = getOperationResultExistent(RESOURCE_MESSAGE, "email");
 
         } catch (final UserNotFoundException e) {
-
             httpCode = HttpCode.NOT_FOUND;
             logger.error("No user found for the given id", e);
             result = getOperationResultNotFound(RESOURCE_MESSAGE);
-
         }
 
         logger.debug("Returning the operation result after updating user: {}", result);
@@ -156,6 +151,7 @@ public class UserResource {
         try {
             services.updatePassword(id, getPasswordFromJson(body));
             result = OperationResult.success();
+            
         } catch (final UserNotFoundException e) {
             httpCode = HttpCode.NOT_FOUND;
             logger.error("No user found for the given id", e);
