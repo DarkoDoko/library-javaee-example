@@ -27,9 +27,9 @@ public class JsonTestUtils {
         assertJsonMatchesExpectedJson(actualJson, readJsonFile(fileNameWithExpectedJson));
     }
     
-    public static void assertJsonMatchesExpectedJson(String actulaJson, String expectedJson) {
+    public static void assertJsonMatchesExpectedJson(String actualJson, String expectedJson) {
         try{
-            JSONAssert.assertEquals(expectedJson, actulaJson, JSONCompareMode.NON_EXTENSIBLE);
+            JSONAssert.assertEquals(expectedJson, actualJson, JSONCompareMode.NON_EXTENSIBLE);
         } catch(JSONException e){
             throw new IllegalArgumentException(e);
         }
