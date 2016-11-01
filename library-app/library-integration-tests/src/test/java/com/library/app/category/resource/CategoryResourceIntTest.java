@@ -17,6 +17,7 @@ import static com.library.app.commontests.utils.IntTestUtils.addElementWithFileA
 import static com.library.app.commontests.utils.IntTestUtils.assertJsonHasTheNumberOfElementsAndReturnTheEntries;
 import static com.library.app.commontests.utils.JsonTestUtils.assertJsonMatchesFileContent;
 import com.library.app.commontests.utils.ResourceClient;
+import static com.library.app.user.UserForTestsRepository.admin;
 import java.io.File;
 import java.net.URL;
 import javax.ws.rs.core.Response;
@@ -54,6 +55,8 @@ public class CategoryResourceIntTest {
     public void initTestCase(){
         resourceClient = new ResourceClient(url);
         resourceClient.resourcePath("/DB").delete();
+        resourceClient.resourcePath("DB/users").postWithContent("");
+        resourceClient.user(admin());
     }
     
     @Test
