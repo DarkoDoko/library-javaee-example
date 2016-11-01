@@ -40,6 +40,42 @@ public class AuthorFilterExtractorFromUrlTest {
                         OrderMode.ASCENDING));
         assertThat(authorFilter.getName(), is(nullValue()));
     }
+    
+    @Test
+	public void withPaginationAndNameAndSortAscending() {
+		setUpUriInfo("2", "5", "Robert", "id");
+
+		AuthorFilterExtractorFromUrl extractor = new AuthorFilterExtractorFromUrl(uriInfoCollaborator);
+		AuthorFilter authorFilter = extractor.getFilter();
+
+		assertActualPaginationDataWithExpected(authorFilter.getPaginationData(), new PaginationData(10, 5, "id",
+				OrderMode.ASCENDING));
+		assertThat(authorFilter.getName(), is(equalTo("Robert")));
+	}
+
+	@Test
+	public void withPaginationAndNameAndSortAscendingWithPrefix() {
+		setUpUriInfo("2", "5", "Robert", "+id");
+
+		AuthorFilterExtractorFromUrl extractor = new AuthorFilterExtractorFromUrl(uriInfoCollaborator);
+		AuthorFilter authorFilter = extractor.getFilter();
+
+		assertActualPaginationDataWithExpected(authorFilter.getPaginationData(), new PaginationData(10, 5, "id",
+				OrderMode.ASCENDING));
+		assertThat(authorFilter.getName(), is(equalTo("Robert")));
+	}
+
+	@Test
+	public void withPaginationAndNameAndSortDescending() {
+		setUpUriInfo("2", "5", "Robert", "-id");
+
+		AuthorFilterExtractorFromUrl extractor = new AuthorFilterExtractorFromUrl(uriInfoCollaborator);
+		AuthorFilter authorFilter = extractor.getFilter();
+
+		assertActualPaginationDataWithExpected(authorFilter.getPaginationData(), new PaginationData(10, 5, "id",
+				OrderMode.DESCENDING));
+		assertThat(authorFilter.getName(), is(equalTo("Robert")));
+	}
 
     private void setUpUriInfo(String page, String perPage, String name, String sort) {
         Map<String, String> parameters = new LinkedHashMap<>();
