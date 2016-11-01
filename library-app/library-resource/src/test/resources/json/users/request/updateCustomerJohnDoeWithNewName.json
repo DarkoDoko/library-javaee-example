@@ -1,6 +1,5 @@
 {
-    "name": "John Doe",
+    "name": "New name",
     "email": "john@domain.com",
-    "password": "123456",
     "type": "CUSTOMER"
 }
