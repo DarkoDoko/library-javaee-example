@@ -1,7 +1,6 @@
 package com.library.app.category.resource;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.library.app.category.CategoryExistentException;
 import com.library.app.category.CategoryNotFoundException;
 import com.library.app.category.model.Category;
@@ -18,6 +17,8 @@ import static com.library.app.common.model.StandardsOperationResults.getOperatio
 import static com.library.app.common.model.StandardsOperationResults.getOperationResultNotFound;
 import com.library.app.pagination.PaginatedData;
 import java.util.List;
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -35,6 +36,7 @@ import org.slf4j.LoggerFactory;
 @Path("/categories")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@RolesAllowed({ "EMPLOYEE" })
 public class CategoryResource {
     
     private Logger logger = LoggerFactory.getLogger(getClass());
@@ -133,6 +135,7 @@ public class CategoryResource {
     }
 
     @GET
+    @PermitAll
     public Response findAll() {
         logger.debug("Find all categories");
         
