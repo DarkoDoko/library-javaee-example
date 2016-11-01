@@ -59,18 +59,20 @@ public class AuthorResourceTest {
     public void addValidAuthor() {
         when(servicesCollaborator.add(robertMartin())).thenReturn(authorWithId(robertMartin(), 1L));
 
-        final Response response = resourceUnderTest
-                        .add(readJsonFile(getPathFileRequest(PATH_RESOURCE, "robertMartin.json")));
+        Response response = resourceUnderTest.add(readJsonFile(getPathFileRequest(PATH_RESOURCE, "robertMartin.json")));
+        
         assertThat(response.getStatus(), is(equalTo(HttpCode.CREATED.getCode())));
         assertJsonMatchesExpectedJson(response.getEntity().toString(), "{\"id\": 1}");
     }
 
     @Test
     public void addAuthorWithNullName() throws Exception {
-        when(servicesCollaborator.add((Author) anyObject())).thenThrow(new FieldNotValidException("name", "may not be null"));
+        when(servicesCollaborator.add((Author) anyObject())).
+        thenThrow(new FieldNotValidException("name", "may not be null"));
 
-        final Response response = resourceUnderTest
-                        .add(readJsonFile(getPathFileRequest(PATH_RESOURCE, "authorWithNullName.json")));
+        Response response = resourceUnderTest.add(
+            readJsonFile(getPathFileRequest(PATH_RESOURCE, "authorWithNullName.json")));
+        
         assertThat(response.getStatus(), is(equalTo(HttpCode.VALIDATION_ERROR.getCode())));
         assertJsonResponseWithFile(response, "authorErrorNullName.json");
     }
@@ -91,8 +93,9 @@ public class AuthorResourceTest {
         doThrow(new FieldNotValidException("name", "may not be null")).when(servicesCollaborator).update(
                         (Author) anyObject());
 
-        final Response response = resourceUnderTest.update(1L,
-                        readJsonFile(getPathFileRequest(PATH_RESOURCE, "authorWithNullName.json")));
+        Response response = resourceUnderTest.update(1L, readJsonFile(getPathFileRequest(
+            PATH_RESOURCE, "authorWithNullName.json")));
+        
         assertThat(response.getStatus(), is(equalTo(HttpCode.VALIDATION_ERROR.getCode())));
         assertJsonResponseWithFile(response, "authorErrorNullName.json");
     }
@@ -101,8 +104,9 @@ public class AuthorResourceTest {
     public void updateAuthorNotFound() throws Exception {
         doThrow(new AuthorNotFoundException()).when(servicesCollaborator).update(authorWithId(robertMartin(), 2L));
 
-        final Response response = resourceUnderTest.update(2L,
-                        readJsonFile(getPathFileRequest(PATH_RESOURCE, "robertMartin.json")));
+        Response response = resourceUnderTest.update(2L, readJsonFile(getPathFileRequest(
+            PATH_RESOURCE, "robertMartin.json")));
+        
         assertThat(response.getStatus(), is(equalTo(HttpCode.NOT_FOUND.getCode())));
     }
 
@@ -110,7 +114,8 @@ public class AuthorResourceTest {
     public void findAuthor() throws AuthorNotFoundException {
         when(servicesCollaborator.findById(1L)).thenReturn(authorWithId(robertMartin(), 1L));
 
-        final Response response = resourceUnderTest.findById(1L);
+        Response response = resourceUnderTest.findById(1L);
+        
         assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
         assertJsonResponseWithFile(response, "robertMartinFound.json");
     }
@@ -119,7 +124,7 @@ public class AuthorResourceTest {
     public void findAuthorNotFound() throws AuthorNotFoundException {
         when(servicesCollaborator.findById(1L)).thenThrow(new AuthorNotFoundException());
 
-        final Response response = resourceUnderTest.findById(1L);
+        Response response = resourceUnderTest.findById(1L);
         assertThat(response.getStatus(), is(equalTo(HttpCode.NOT_FOUND.getCode())));
     }
 

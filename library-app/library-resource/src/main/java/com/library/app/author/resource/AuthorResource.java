@@ -79,7 +79,7 @@ public class AuthorResource {
     @Path("/{id}")
     public Response update(@PathParam("id") Long id, String body) {
         logger.debug("Updating the author {} with body {}", id, body);
-        final Author author = jsonConverter.convertFrom(body);
+        Author author = jsonConverter.convertFrom(body);
         author.setId(id);
 
         HttpCode httpCode = HttpCode.OK;
@@ -87,11 +87,11 @@ public class AuthorResource {
         try {
             services.update(author);
             result = OperationResult.success();
-        } catch (final FieldNotValidException e) {
+        } catch (FieldNotValidException e) {
             httpCode = HttpCode.VALIDATION_ERROR;
             logger.error("One of the fields of the author is not valid", e);
             result = getOperationResultInvalidField(RESOURCE_MESSAGE, e);
-        } catch (final AuthorNotFoundException e) {
+        } catch (AuthorNotFoundException e) {
             httpCode = HttpCode.NOT_FOUND;
             logger.error("No author found for the given id", e);
             result = getOperationResultNotFound(RESOURCE_MESSAGE);
@@ -110,13 +110,13 @@ public class AuthorResource {
         logger.debug("Find author: {}", id);
         ResponseBuilder responseBuilder;
         try {
-            final Author author = services.findById(id);
-            final OperationResult result = OperationResult.success(jsonConverter.convertToJsonElement(author));
+            Author author = services.findById(id);
+            OperationResult result = OperationResult.success(jsonConverter.convertToJsonElement(author));
             responseBuilder = Response
                                 .status(HttpCode.OK.getCode())
                                 .entity(OperationResultJsonWriter.toJson(result));
             logger.debug("Author found: {}", author);
-        } catch (final AuthorNotFoundException e) {
+        } catch (AuthorNotFoundException e) {
             logger.error("No author found for id", id);
             responseBuilder = Response.status(HttpCode.NOT_FOUND.getCode());
         }

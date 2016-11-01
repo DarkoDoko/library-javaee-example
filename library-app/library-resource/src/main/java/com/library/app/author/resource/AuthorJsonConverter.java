@@ -11,18 +11,18 @@ import javax.enterprise.context.ApplicationScoped;
 public class AuthorJsonConverter implements EntityJsonConverter<Author>{
 
     @Override
-    public Author convertFrom(final String json) {
-        final JsonObject jsonObject = JsonReader.readAsJsonObject(json);
+    public Author convertFrom(String json) {
+        JsonObject jsonObject = JsonReader.readAsJsonObject(json);
 
-        final Author author = new Author();
+        Author author = new Author();
         author.setName(JsonReader.getStringOrNull(jsonObject, "name"));
 
         return author;
     }
 
     @Override
-    public JsonElement convertToJsonElement(final Author author) {
-        final JsonObject jsonObject = new JsonObject();
+    public JsonElement convertToJsonElement(Author author) {
+        JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("id", author.getId());
         jsonObject.addProperty("name", author.getName());
         return jsonObject;
