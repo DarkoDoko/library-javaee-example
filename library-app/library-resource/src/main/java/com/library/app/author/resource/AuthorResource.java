@@ -15,7 +15,8 @@ import com.library.app.json.JsonUtils;
 import com.library.app.json.JsonWriter;
 import com.library.app.json.OperationResultJsonWriter;
 import com.library.app.pagination.PaginatedData;
-import java.util.logging.Level;
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -35,6 +36,7 @@ import org.slf4j.LoggerFactory;
 @Path("/authors")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@RolesAllowed({ "EMPLOYEE" })
 public class AuthorResource {
     
     private Logger logger = LoggerFactory.getLogger(getClass());
@@ -123,6 +125,7 @@ public class AuthorResource {
     }
 
     @GET
+    @PermitAll
     public Response findByFilter() {
         AuthorFilter filter = new AuthorFilterExtractorFromUrl(uriInfo).getFilter();
         PaginatedData<Author> authors = services.findByFilter(filter);
