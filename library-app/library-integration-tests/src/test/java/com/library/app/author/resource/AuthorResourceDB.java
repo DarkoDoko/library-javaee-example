@@ -1,4 +1,4 @@
-package com.library.app.commontests.author;
+package com.library.app.author.resource;
 
 import com.library.app.author.AuthorForTestsRepository;
 import com.library.app.author.services.AuthorServices;
