@@ -2,10 +2,8 @@ package com.library.app.commontests.utils;
 
 import com.library.app.pagination.filter.PaginationData;
 import java.util.Map;
-import java.util.Map.Entry;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
-import org.hamcrest.CoreMatchers;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
