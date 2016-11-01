@@ -24,7 +24,6 @@ import org.mockito.MockitoAnnotations;
 import static com.library.app.commontests.utils.FileTestNameUtils.*;
 import static com.library.app.commontests.utils.JsonTestUtils.*;
 import com.library.app.pagination.PaginatedData;
-import com.library.app.pagination.filter.PaginationData;
 import java.util.Arrays;
 import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
