@@ -28,7 +28,7 @@ create table lib_user_role (
     user_id bigint not null,
     role varchar(30) not null,
     primary key(user_id, role),
-    constraint fk_user_roles_user foreign key(user_id) references lib_user(id)
+    constraint fk_user_roles_user foreign key(user_id) references lib_user(id) on delete cascade
 );
 
 insert into lib_user (created_at, name, email, password, type) values(current_timestamp, 'Admin', 'adm@domain.com', 'jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=', 'EMPLOYEE');
