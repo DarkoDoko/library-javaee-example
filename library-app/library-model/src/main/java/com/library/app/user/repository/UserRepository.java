@@ -6,10 +6,12 @@ import com.library.app.user.model.User;
 import com.library.app.user.model.filter.UserFilter;
 import java.util.HashMap;
 import java.util.Map;
+import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 
+@Stateless
 public class UserRepository extends GenericRepository<User> {
 
     @PersistenceContext
