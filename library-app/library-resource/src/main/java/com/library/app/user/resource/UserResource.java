@@ -77,12 +77,12 @@ public class UserResource {
         try {
             user = services.add(user);
             result = OperationResult.success(JsonUtils.getJsonElementWithId(user.getId()));
-            
+
         } catch (UserExistentException e) {
             httpCode = HttpCode.VALIDATION_ERROR;
             logger.error("There is already an user for the given email", e);
             result = getOperationResultExistent(RESOURCE_MESSAGE, "email");
-            
+
         } catch (FieldNotValidException e) {
             httpCode = HttpCode.VALIDATION_ERROR;
             logger.error("One of the fields of the user is not valid", e);
@@ -151,7 +151,7 @@ public class UserResource {
         try {
             services.updatePassword(id, getPasswordFromJson(body));
             result = OperationResult.success();
-            
+
         } catch (final UserNotFoundException e) {
             httpCode = HttpCode.NOT_FOUND;
             logger.error("No user found for the given id", e);
@@ -172,8 +172,8 @@ public class UserResource {
             User user = services.findById(id);
             OperationResult result = OperationResult.success(jsonConverter.convertToJsonElement(user));
             responseBuilder = Response.
-                                status(HttpCode.OK.getCode()).
-                                entity(OperationResultJsonWriter.toJson(result));
+                status(HttpCode.OK.getCode()).
+                entity(OperationResultJsonWriter.toJson(result));
             logger.debug("User found by id: {}", user);
         } catch (final UserNotFoundException e) {
             logger.error("No user found for id", id);
@@ -196,8 +196,8 @@ public class UserResource {
 
             OperationResult result = OperationResult.success(jsonConverter.convertToJsonElement(user));
             responseBuilder = Response.
-                                status(HttpCode.OK.getCode()).
-                                entity(OperationResultJsonWriter.toJson(result));
+                status(HttpCode.OK.getCode()).
+                entity(OperationResultJsonWriter.toJson(result));
             logger.debug("User found by email/password: {}", user);
         } catch (UserNotFoundException e) {
             logger.error("No user found for email/password");
@@ -236,11 +236,16 @@ public class UserResource {
 
     private boolean isLoggedUser(final Long id) {
         try {
-            User loggerUser = services.findByEmail(securityContext.getUserPrincipal().getName());
-            if (loggerUser.getId().equals(id)) {
-                return true;
+            String principalName = securityContext.getUserPrincipal().getName();
+            
+            if (principalName != null) {
+                User loggedUser = services.findByEmail(principalName);
+                if (loggedUser.getId().equals(id)) {
+                    return true;
+                }
             }
         } catch (final UserNotFoundException e) {
+            //do nothing. False is returned
         }
         return false;
     }
