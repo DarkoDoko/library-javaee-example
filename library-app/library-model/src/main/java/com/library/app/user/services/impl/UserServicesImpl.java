@@ -83,7 +83,7 @@ public class UserServicesImpl implements UserServices {
         return repository.findByFilter(userFilter);
     }
 
-    private void validateUser(User user) throws FieldNotValidException {
+    private void validateUser(User user) throws FieldNotValidException, UserExistentException{
         if (repository.alreadyExists(user)) {
             throw new UserExistentException();
         }
