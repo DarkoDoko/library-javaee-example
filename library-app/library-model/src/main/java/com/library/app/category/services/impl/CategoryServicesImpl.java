@@ -5,14 +5,10 @@ import com.library.app.category.CategoryNotFoundException;
 import com.library.app.category.model.Category;
 import com.library.app.category.repository.CategoryRepository;
 import com.library.app.category.services.CategoryServices;
-import com.library.app.FieldNotValidException;
 import com.library.app.ValidationUtils;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
-import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
 @Stateless
@@ -60,20 +56,10 @@ public class CategoryServicesImpl implements CategoryServices{
     }
     
     private void validateCategory(Category category) {
-        validateCategoryFields(category);
+        ValidationUtils.validateEntityFields(validator, category);
         
         if(repository.alreadyExists(category)){
             throw new CategoryExistentException();
         }
-    }
-
-    private void validateCategoryFields(Category category) {
-        
-        ValidationUtils.validateEntityFields(validator, category);
-        
-        if(repository.alreadyExists(category)) {
-            throw new CategoryExistentException();
-        }
-    }
-    
+    }    
 }
