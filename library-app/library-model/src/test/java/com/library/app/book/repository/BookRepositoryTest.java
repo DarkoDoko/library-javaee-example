@@ -18,6 +18,8 @@ import com.library.app.book.model.BookFilter;
 import static com.library.app.category.CategoryForTestsRepository.allCategories;
 import com.library.app.commontests.utils.TestBaseRepository;
 import com.library.app.pagination.PaginatedData;
+import com.library.app.pagination.filter.PaginationData;
+import com.library.app.pagination.filter.PaginationData.OrderMode;
 import java.util.List;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -119,6 +121,29 @@ public class BookRepositoryTest extends TestBaseRepository {
         assertThat(result.getRow(3).getTitle(), is(equalTo(peaa().getTitle())));
         assertThat(result.getRow(4).getTitle(), is(equalTo(refactoring().getTitle())));
     }
+    
+    @Test
+	public void findByFilterWithPaging() {
+		loadBooksForFindByFilter();
+
+		final BookFilter bookFilter = new BookFilter();
+		bookFilter.setPaginationData(new PaginationData(0, 3, "title", OrderMode.DESCENDING));
+		PaginatedData<Book> result = bookRUT.findByFilter(bookFilter);
+
+		assertThat(result.getNumberOfRows(), is(equalTo(5)));
+		assertThat(result.getRows().size(), is(equalTo(3)));
+		assertThat(result.getRow(0).getTitle(), is(equalTo(refactoring().getTitle())));
+		assertThat(result.getRow(1).getTitle(), is(equalTo(peaa().getTitle())));
+		assertThat(result.getRow(2).getTitle(), is(equalTo(effectiveJava().getTitle())));
+
+		bookFilter.setPaginationData(new PaginationData(3, 3, "title", OrderMode.DESCENDING));
+		result = bookRUT.findByFilter(bookFilter);
+
+		assertThat(result.getNumberOfRows(), is(equalTo(5)));
+		assertThat(result.getRows().size(), is(equalTo(2)));
+		assertThat(result.getRow(0).getTitle(), is(equalTo(designPatterns().getTitle())));
+		assertThat(result.getRow(1).getTitle(), is(equalTo(BookForTestsRepository.cleanCode().getTitle())));
+	}
 
     private void loadBooksForFindByFilter() {
         dbExecutor.executeCommand(() -> {
