@@ -64,6 +64,29 @@ public class BookRepositoryTest extends TestBaseRepository {
         Book book = bookRUT.findById(999L);
         assertThat(book, is(nullValue()));
     }
+    
+    @Test
+    public void updateBook() {
+        Book designPatterns = normalizeDependencies(designPatterns(), em);
+        Long bookAddedId = dbExecutor.executeCommand(() -> {
+            return bookRUT.add(designPatterns).getId();
+        });
+        
+        assertThat(bookAddedId, is(notNullValue()));
+        
+        Book book = bookRUT.findById(bookAddedId);
+        
+        assertThat(book.getTitle(), is(equalTo(designPatterns().getTitle())));
+
+		book.setTitle("Design Patterns");
+		dbExecutor.executeCommand(() -> {
+			bookRUT.update(book);
+			return null;
+		});
+
+		Book bookAfterUpdate = bookRUT.findById(bookAddedId);
+		assertThat(bookAfterUpdate.getTitle(), is(equalTo("Design Patterns")));
+    }
 
     private void assertAuthors(Book book, Author... expectedAuthors) {
         List<Author> authors = book.getAuthors();
