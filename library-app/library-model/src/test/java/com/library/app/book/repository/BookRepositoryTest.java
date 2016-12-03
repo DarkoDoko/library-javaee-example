@@ -16,6 +16,7 @@ import static com.library.app.book.BookForTestsRepository.refactoring;
 import com.library.app.book.model.Book;
 import com.library.app.book.model.BookFilter;
 import static com.library.app.category.CategoryForTestsRepository.allCategories;
+import static com.library.app.category.CategoryForTestsRepository.architecture;
 import com.library.app.commontests.utils.TestBaseRepository;
 import com.library.app.pagination.PaginatedData;
 import com.library.app.pagination.filter.PaginationData;
@@ -128,7 +129,8 @@ public class BookRepositoryTest extends TestBaseRepository {
 
 		final BookFilter bookFilter = new BookFilter();
 		bookFilter.setPaginationData(new PaginationData(0, 3, "title", OrderMode.DESCENDING));
-		PaginatedData<Book> result = bookRUT.findByFilter(bookFilter);
+		
+        PaginatedData<Book> result = bookRUT.findByFilter(bookFilter);
 
 		assertThat(result.getNumberOfRows(), is(equalTo(5)));
 		assertThat(result.getRows().size(), is(equalTo(3)));
@@ -143,6 +145,25 @@ public class BookRepositoryTest extends TestBaseRepository {
 		assertThat(result.getRows().size(), is(equalTo(2)));
 		assertThat(result.getRow(0).getTitle(), is(equalTo(designPatterns().getTitle())));
 		assertThat(result.getRow(1).getTitle(), is(equalTo(BookForTestsRepository.cleanCode().getTitle())));
+	}
+    
+    @Test
+	public void findByFilterFilteringByCategoryAndTitle() {
+		loadBooksForFindByFilter();
+
+		final Book book = new Book();
+		book.setCategory(architecture());
+
+		final BookFilter bookFilter = new BookFilter();
+		bookFilter.setCategoryId(normalizeDependencies(book, em).getCategory().getId());
+		bookFilter.setTitle("Software");
+		bookFilter.setPaginationData(new PaginationData(0, 3, "title", OrderMode.ASCENDING));
+		
+        final PaginatedData<Book> result = bookRUT.findByFilter(bookFilter);
+
+		assertThat(result.getNumberOfRows(), is(equalTo(1)));
+		assertThat(result.getRows().size(), is(equalTo(1)));
+		assertThat(result.getRow(0).getTitle(), is(equalTo(designPatterns().getTitle())));
 	}
 
     private void loadBooksForFindByFilter() {
