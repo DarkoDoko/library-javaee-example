@@ -85,7 +85,7 @@ public class Book implements Serializable{
 
     public List<Author> getAuthors() {
         if(authors == null) {
-            return new ArrayList<>();
+            authors = new ArrayList<>();
         }
         return authors;
     }
