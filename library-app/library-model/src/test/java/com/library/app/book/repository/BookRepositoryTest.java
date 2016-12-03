@@ -15,8 +15,8 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import org.junit.After;
-import org.junit.Assert;
 import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,6 +57,12 @@ public class BookRepositoryTest extends TestBaseRepository {
         assertAuthors(book, erichGamma(), johnVlissides(), ralphJohnson(), richardHelm());
         assertThat(book.getPrice(), is(equalTo(48.94D)));
 
+    }
+    
+    @Test
+    public void findBookByIdNotFound() {
+        Book book = bookRUT.findById(999L);
+        assertThat(book, is(nullValue()));
     }
 
     private void assertAuthors(Book book, Author... expectedAuthors) {
