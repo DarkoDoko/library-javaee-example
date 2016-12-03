@@ -24,7 +24,7 @@ import javax.validation.constraints.Size;
 import org.hibernate.annotations.ManyToAny;
 
 @Entity
-@Table(name = "lib_user")
+@Table(name = "lib_book")
 public class Book implements Serializable{
     private static final long serialVersionUID = -98804459764760011L;
     
