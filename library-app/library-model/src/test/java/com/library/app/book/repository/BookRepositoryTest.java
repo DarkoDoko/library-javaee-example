@@ -6,11 +6,18 @@ import static com.library.app.author.AuthorForTestsRepository.johnVlissides;
 import static com.library.app.author.AuthorForTestsRepository.ralphJohnson;
 import static com.library.app.author.AuthorForTestsRepository.richardHelm;
 import com.library.app.author.model.Author;
+import com.library.app.book.BookForTestsRepository;
+import static com.library.app.book.BookForTestsRepository.allBooks;
 import static com.library.app.book.BookForTestsRepository.designPatterns;
+import static com.library.app.book.BookForTestsRepository.effectiveJava;
 import static com.library.app.book.BookForTestsRepository.normalizeDependencies;
+import static com.library.app.book.BookForTestsRepository.peaa;
+import static com.library.app.book.BookForTestsRepository.refactoring;
 import com.library.app.book.model.Book;
+import com.library.app.book.model.BookFilter;
 import static com.library.app.category.CategoryForTestsRepository.allCategories;
 import com.library.app.commontests.utils.TestBaseRepository;
+import com.library.app.pagination.PaginatedData;
 import java.util.List;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -58,46 +65,67 @@ public class BookRepositoryTest extends TestBaseRepository {
         assertThat(book.getPrice(), is(equalTo(48.94D)));
 
     }
-    
+
     @Test
     public void findBookByIdNotFound() {
         Book book = bookRUT.findById(999L);
         assertThat(book, is(nullValue()));
     }
-    
+
     @Test
     public void updateBook() {
         Book designPatterns = normalizeDependencies(designPatterns(), em);
         Long bookAddedId = dbExecutor.executeCommand(() -> {
             return bookRUT.add(designPatterns).getId();
         });
-        
+
         assertThat(bookAddedId, is(notNullValue()));
-        
+
         Book book = bookRUT.findById(bookAddedId);
-        
+
         assertThat(book.getTitle(), is(equalTo(designPatterns().getTitle())));
 
-		book.setTitle("Design Patterns");
-		dbExecutor.executeCommand(() -> {
-			bookRUT.update(book);
-			return null;
-		});
+        book.setTitle("Design Patterns");
+        dbExecutor.executeCommand(() -> {
+            bookRUT.update(book);
+            return null;
+        });
 
-		Book bookAfterUpdate = bookRUT.findById(bookAddedId);
-		assertThat(bookAfterUpdate.getTitle(), is(equalTo("Design Patterns")));
+        Book bookAfterUpdate = bookRUT.findById(bookAddedId);
+        assertThat(bookAfterUpdate.getTitle(), is(equalTo("Design Patterns")));
     }
-    
-    @Test
-	public void existsById() {
-		Book designPatterns = normalizeDependencies(designPatterns(), em);
-		Long bookAddedId = dbExecutor.executeCommand(() -> {
-			return bookRUT.add(designPatterns).getId();
-		});
 
-		assertThat(bookRUT.existsById(bookAddedId), is(equalTo(true)));
-		assertThat(bookRUT.existsById(999l), is(equalTo(false)));
-	}
+    @Test
+    public void existsById() {
+        Book designPatterns = normalizeDependencies(designPatterns(), em);
+        Long bookAddedId = dbExecutor.executeCommand(() -> {
+            return bookRUT.add(designPatterns).getId();
+        });
+
+        assertThat(bookRUT.existsById(bookAddedId), is(equalTo(true)));
+        assertThat(bookRUT.existsById(999l), is(equalTo(false)));
+    }
+
+    @Test
+    public void findByFilterNoFilter() {
+        loadBooksForFindByFilter();
+
+        PaginatedData<Book> result = bookRUT.findByFilter(new BookFilter());
+        assertThat(result.getNumberOfRows(), is(equalTo(5)));
+        assertThat(result.getRows().size(), is(equalTo(5)));
+        assertThat(result.getRow(0).getTitle(), is(equalTo(BookForTestsRepository.cleanCode().getTitle())));
+        assertThat(result.getRow(1).getTitle(), is(equalTo(designPatterns().getTitle())));
+        assertThat(result.getRow(2).getTitle(), is(equalTo(effectiveJava().getTitle())));
+        assertThat(result.getRow(3).getTitle(), is(equalTo(peaa().getTitle())));
+        assertThat(result.getRow(4).getTitle(), is(equalTo(refactoring().getTitle())));
+    }
+
+    private void loadBooksForFindByFilter() {
+        dbExecutor.executeCommand(() -> {
+            allBooks().forEach((book) -> bookRUT.add(normalizeDependencies(book, em)));
+            return null;
+        });
+    }
 
     private void assertAuthors(Book book, Author... expectedAuthors) {
         List<Author> authors = book.getAuthors();
