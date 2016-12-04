@@ -18,9 +18,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.validation.Validator;
 
+@Stateless
 public class BookServicesImpl implements BookServices{
     
     @Inject
@@ -36,7 +38,7 @@ public class BookServicesImpl implements BookServices{
     CategoryServices categoryServices;
     
     @Override
-    public Book add(Book book) throws FieldNotValidException, CategoryNotFoundException, AuthorNotFoundException {
+    public Book add(Book book) {
         ValidationUtils.validateEntityFields(validator, book);
         
         checkCategoryAndSetItOnBook(book);
@@ -69,12 +71,8 @@ public class BookServicesImpl implements BookServices{
         List<Author> newAuthorList = new ArrayList<>();
         
         book.getAuthors().forEach((a) -> {
-            try {
-                Author author = authorServices.findById(a.getId());
-                newAuthorList.add(author);
-            } catch (AuthorNotFoundException ex) {
-                Logger.getLogger(BookServicesImpl.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            Author author = authorServices.findById(a.getId());
+            newAuthorList.add(author);
         });
         book.setAuthors(newAuthorList);
     }
