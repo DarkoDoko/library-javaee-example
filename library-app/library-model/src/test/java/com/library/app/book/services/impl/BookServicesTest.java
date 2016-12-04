@@ -22,6 +22,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import org.junit.Before;
@@ -187,6 +188,22 @@ public class BookServicesTest {
 
 		bookServicesUnderTest.update(bookToUpdate);
 		verify(bookRepository).update(bookEq(bookToUpdate));
+	}
+    
+    @Test(expected = BookNotFoundException.class)
+	public void findBookByIdNotFound() throws BookNotFoundException {
+		when(bookRepository.findById(1L)).thenReturn(null);
+
+		bookServicesUnderTest.findById(1L);
+	}
+    
+    @Test
+	public void findBookById() throws BookNotFoundException {
+		when(bookRepository.findById(1L)).thenReturn(bookWithId(cleanCode(), 1L));
+
+		Book book = bookServicesUnderTest.findById(1L);
+		assertThat(book, is(notNullValue()));
+		assertThat(book.getTitle(), is(equalTo(cleanCode().getTitle())));
 	}
     
     private void addBookWithInvalidField(final Book book, final String expectedInvalidFieldName) {

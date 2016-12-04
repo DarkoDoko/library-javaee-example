@@ -63,7 +63,11 @@ public class BookServicesImpl implements BookServices{
 
     @Override
     public Book findById(Long id) throws BookNotFoundException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Book book = bookRepository.findById(id);
+        if(book == null) {
+            throw new BookNotFoundException();
+        }
+        return book;
     }
 
     @Override
