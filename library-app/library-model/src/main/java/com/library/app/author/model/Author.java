@@ -22,7 +22,6 @@ public class Author implements Serializable{
     
     @NotNull
     @Size(min = 2, max = 40)
-    @Column
     private String name;
 
     public Author() {
@@ -30,6 +29,10 @@ public class Author implements Serializable{
 
     public Author(String name) {
         this.name = name;
+    }
+
+    public Author(Long id) {
+        this.id = id;
     }
 
     public Long getId() {
