@@ -6,4 +6,4 @@ jdk:
 before_install:
   - cd ./library-app/
 
-script: mvn clean install
+script: mvn --also-make --projects library-resource,library-model install
