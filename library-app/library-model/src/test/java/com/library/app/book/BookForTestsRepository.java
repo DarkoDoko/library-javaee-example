@@ -16,7 +16,7 @@ public class BookForTestsRepository {
 		Book book = new Book();
 		book.setTitle("Clean Code: A Handbook of Agile Software Craftsmanship");
 		book.setDescription("Even bad code can function. But if code isn't clean, ...");
-		book.setCategory(CategoryForTestsRepository.cleanCode());
+		book.setCategory(categoryWithId(CategoryForTestsRepository.cleanCode(), 1L));
 		book.addAuthor(robertMartin());
 		book.setPrice(35.06);
 
@@ -27,7 +27,7 @@ public class BookForTestsRepository {
 		Book book = new Book();
 		book.setTitle("Design Patterns: Elements of Reusable Object-Oriented Software");
 		book.setDescription("Design Patterns is a modern classic in the literature of object-oriented development");
-		book.setCategory(architecture());
+		book.setCategory(categoryWithId(architecture(), 1L));
 		book.addAuthor(erichGamma());
 		book.addAuthor(johnVlissides());
 		book.addAuthor(ralphJohnson());
@@ -41,7 +41,7 @@ public class BookForTestsRepository {
 		Book book = new Book();
 		book.setTitle("Patterns of Enterprise Application Architecture");
 		book.setDescription("Developers of enterprise applications (e.g reservation systems, supply...");
-		book.setCategory(architecture());
+		book.setCategory(categoryWithId(architecture(), 1L));
 		book.addAuthor(martinFowler());
 		book.setPrice(52D);
 
@@ -52,7 +52,7 @@ public class BookForTestsRepository {
 		Book book = new Book();
 		book.setTitle("Refactoring: Improving the Design of Existing Code");
 		book.setDescription("Your class library works, but could it be better?...");
-		book.setCategory(CategoryForTestsRepository.cleanCode());
+		book.setCategory(categoryWithId(CategoryForTestsRepository.cleanCode(), 1L));
 		book.addAuthor(martinFowler());
 		book.addAuthor(kentBeck());
 		book.addAuthor(johnBrant());
@@ -67,7 +67,7 @@ public class BookForTestsRepository {
 		Book book = new Book();
 		book.setTitle("Effective Java (2nd Edition)");
 		book.setDescription("Are you looking for a deeper understanding of the Java programming language so ..");
-		book.setCategory(java());
+		book.setCategory(categoryWithId(java(), 1L));
 		book.addAuthor(joshuaBloch());
 		book.setPrice(38.80D);
 
