@@ -40,7 +40,7 @@ public class CategoryServicesImpl implements CategoryServices{
     }
 
     @Override
-    public Category findById(long id) {
+    public Category findById(long id) throws CategoryNotFoundException{
         Category category = repository.findById(id);
         
         if(category == null){
