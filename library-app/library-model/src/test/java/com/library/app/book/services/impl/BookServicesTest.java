@@ -9,6 +9,7 @@ import static com.library.app.book.BookArgumentMatcher.bookEq;
 import static com.library.app.book.BookForTestsRepository.bookWithId;
 import static com.library.app.book.BookForTestsRepository.cleanCode;
 import static com.library.app.book.BookForTestsRepository.designPatterns;
+import com.library.app.book.BookNotFoundException;
 import com.library.app.book.model.Book;
 import com.library.app.book.repository.BookRepository;
 import com.library.app.book.services.BookServices;
@@ -28,6 +29,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.mockito.Matchers.anyLong;
 import org.mockito.Mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 
@@ -128,6 +130,63 @@ public class BookServicesTest {
 
 		final Book bookAdded = bookServicesUnderTest.add(cleanCode());
 		assertThat(bookAdded.getId(), equalTo(1L));
+	}
+    
+    @Test
+	public void updateAuthorWithShortTitle() {
+		final Book book = cleanCode();
+		book.setTitle("short");
+		try {
+			bookServicesUnderTest.update(book);
+			fail("An error should have been thrown");
+		} catch (final FieldNotValidException e) {
+			assertThat(e.getFieldName(), is(equalTo("title")));
+		} catch (final Exception e) {
+			fail("An Exception should not have been thrown");
+		}
+	}
+
+	@Test(expected = BookNotFoundException.class)
+	public void updateBookNotFound() throws Exception {
+		when(bookRepository.existsById(1L)).thenReturn(false);
+
+		bookServicesUnderTest.update(bookWithId(cleanCode(), 1L));
+	 }
+
+	@Test(expected = CategoryNotFoundException.class)
+	public void updateBookWithInexistentCategory() throws Exception {
+		when(bookRepository.existsById(1L)).thenReturn(true);
+		when(categoryServices.findById(1L)).thenThrow(new CategoryNotFoundException());
+
+		final Book book = bookWithId(cleanCode(), 1L);
+		book.getCategory().setId(1L);
+
+		bookServicesUnderTest.update(book);
+	}
+
+	@Test(expected = AuthorNotFoundException.class)
+	public void updateBookWithInexistentAuthor() throws Exception {
+		when(bookRepository.existsById(1L)).thenReturn(true);
+		when(categoryServices.findById(anyLong())).thenReturn(cleanCode().getCategory());
+		when(authorServices.findById(1L)).thenReturn(erichGamma());
+		when(authorServices.findById(2L)).thenThrow(new AuthorNotFoundException());
+
+		final Book book = bookWithId(designPatterns(), 1L);
+		book.getAuthors().get(0).setId(1L);
+		book.getAuthors().get(1).setId(2L);
+
+		bookServicesUnderTest.update(book);
+	}
+
+	@Test
+	public void updateValidBook() throws Exception {
+		final Book bookToUpdate = bookWithId(cleanCode(), 1L);
+		when(categoryServices.findById(anyLong())).thenReturn(cleanCode().getCategory());
+		when(authorServices.findById(anyLong())).thenReturn(robertMartin());
+		when(bookRepository.existsById(1L)).thenReturn(true);
+
+		bookServicesUnderTest.update(bookToUpdate);
+		verify(bookRepository).update(bookEq(bookToUpdate));
 	}
     
     private void addBookWithInvalidField(final Book book, final String expectedInvalidFieldName) {

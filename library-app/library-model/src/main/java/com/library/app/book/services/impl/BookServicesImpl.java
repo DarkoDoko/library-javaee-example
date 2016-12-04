@@ -49,7 +49,16 @@ public class BookServicesImpl implements BookServices{
 
     @Override
     public void update(Book book) throws FieldNotValidException, CategoryNotFoundException, AuthorNotFoundException, BookNotFoundException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ValidationUtils.validateEntityFields(validator, book);
+        
+        if(!bookRepository.existsById(book.getId())) {
+            throw new BookNotFoundException();
+        }
+        
+        checkCategoryAndSetItOnBook(book);
+        checkAuthorsAndSetThemOnBook(book);
+        
+        bookRepository.update(book);
     }
 
     @Override
