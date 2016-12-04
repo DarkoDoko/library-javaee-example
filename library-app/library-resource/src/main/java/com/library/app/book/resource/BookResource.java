@@ -17,6 +17,7 @@ import com.library.app.json.OperationResultJsonWriter;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -25,6 +26,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,6 +109,24 @@ public class BookResource {
 
 		logger.debug("Returning the operation result after updating book: {}", result);
 		return Response.status(httpCode.getCode()).entity(OperationResultJsonWriter.toJson(result)).build();
+	}
+    
+    @GET
+	@Path("/{id}")
+	public Response findById(@PathParam("id") final Long id) {
+		logger.debug("Find book: {}", id);
+		ResponseBuilder responseBuilder;
+		try {
+			Book book = bookServices.findById(id);
+			OperationResult result = OperationResult.success(bookJsonConverter.convertToJsonElement(book));
+			responseBuilder = Response.status(HttpCode.OK.getCode()).entity(OperationResultJsonWriter.toJson(result));
+			logger.debug("Book found: {}", book);
+		} catch (BookNotFoundException e) {
+			logger.error("No book found for id", id);
+			responseBuilder = Response.status(HttpCode.NOT_FOUND.getCode());
+		}
+
+		return responseBuilder.build();
 	}
     
 }

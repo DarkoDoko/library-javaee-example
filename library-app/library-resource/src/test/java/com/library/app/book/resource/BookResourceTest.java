@@ -7,6 +7,7 @@ import com.library.app.author.resource.AuthorJsonConverter;
 import static com.library.app.book.BookArgumentMatcher.bookEq;
 import static com.library.app.book.BookForTestsRepository.bookWithId;
 import static com.library.app.book.BookForTestsRepository.cleanCode;
+import static com.library.app.book.BookForTestsRepository.designPatterns;
 import com.library.app.book.BookNotFoundException;
 import com.library.app.book.model.Book;
 import com.library.app.book.services.BookServices;
@@ -112,6 +113,29 @@ public class BookResourceTest {
 	public void updateBookNotFound() throws Exception {
 		updateBookWithError(new BookNotFoundException(), HttpCode.NOT_FOUND, "cleanCode.json",
 				"bookErrorInexistentAuthor.json");
+	}
+    
+    @Test
+	public void findBook() throws BookNotFoundException {
+		Book book = bookWithId(designPatterns(), 1L);
+		book.getCategory().setId(1L);
+		for (int i = 1; i <= book.getAuthors().size(); i++) {
+			book.getAuthors().get(i - 1).setId(new Long(i));
+		}
+
+		when(bookServices.findById(1L)).thenReturn(book);
+
+		Response response = bookResourceUnderTest.findById(1L);
+		assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
+		assertJsonResponseWithFile(response, "designPatternsFound.json");
+	}
+    
+    @Test
+	public void findBookNotFound() throws BookNotFoundException {
+		when(bookServices.findById(1L)).thenThrow(new BookNotFoundException());
+
+		Response response = bookResourceUnderTest.findById(1L);
+		assertThat(response.getStatus(), is(equalTo(HttpCode.NOT_FOUND.getCode())));
 	}
     
     private void addBookWithValidationError(final Exception exceptionToBeThrown, final String requestFileName,
