@@ -11,11 +11,14 @@ import static com.library.app.book.BookForTestsRepository.cleanCode;
 import static com.library.app.book.BookForTestsRepository.designPatterns;
 import com.library.app.book.BookNotFoundException;
 import com.library.app.book.model.Book;
+import com.library.app.book.model.BookFilter;
 import com.library.app.book.repository.BookRepository;
 import com.library.app.book.services.BookServices;
 import com.library.app.category.CategoryNotFoundException;
 import com.library.app.category.services.CategoryServices;
+import com.library.app.pagination.PaginatedData;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.validation.Validation;
@@ -29,6 +32,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyObject;
 import org.mockito.Mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -204,6 +208,16 @@ public class BookServicesTest {
 		Book book = bookServicesUnderTest.findById(1L);
 		assertThat(book, is(notNullValue()));
 		assertThat(book.getTitle(), is(equalTo(cleanCode().getTitle())));
+	}
+    
+    @Test
+	public void findBookByFilter() {
+		final PaginatedData<Book> books = new PaginatedData<>(1, Arrays.asList(bookWithId(cleanCode(), 1L)));
+		when(bookRepository.findByFilter((BookFilter) anyObject())).thenReturn(books);
+
+		final PaginatedData<Book> booksReturned = bookServicesUnderTest.findByFilter(new BookFilter());
+		assertThat(booksReturned.getNumberOfRows(), is(equalTo(1)));
+		assertThat(booksReturned.getRow(0).getTitle(), is(equalTo(cleanCode().getTitle())));
 	}
     
     private void addBookWithInvalidField(final Book book, final String expectedInvalidFieldName) {

@@ -72,7 +72,7 @@ public class BookServicesImpl implements BookServices{
 
     @Override
     public PaginatedData<Book> findByFilter(BookFilter bookFilter) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return bookRepository.findByFilter(bookFilter);
     }
 
     private void checkCategoryAndSetItOnBook(Book book) {
