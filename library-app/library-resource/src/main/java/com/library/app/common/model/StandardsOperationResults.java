@@ -18,4 +18,8 @@ public class StandardsOperationResults {
     public static OperationResult getOperationResultNotFound(ResourceMessage message){
         return OperationResult.error(message.getKeyOfResourceNotFound(), message.getMessageOfResourceNotFound());
     }
+    
+    public static OperationResult getOperationResultDependencyNotFound(ResourceMessage message, String dependecyField) {
+        return OperationResult.error(message.getKeyOfInvalidField(dependecyField), message.getMessageNotFound());
+    }
 }
