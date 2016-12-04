@@ -22,14 +22,14 @@ public class AuthorServicesImpl implements AuthorServices{
     Validator validator;
 
     @Override
-    public Author add(Author author) throws FieldNotValidException {
+    public Author add(Author author) {
         ValidationUtils.validateEntityFields(validator, author);
 
         return repository.add(author);
     }
 
     @Override
-    public void update(Author author) throws FieldNotValidException, AuthorNotFoundException {
+    public void update(Author author) {
         ValidationUtils.validateEntityFields(validator, author);
 
         if(!repository.existsById(author.getId())){
