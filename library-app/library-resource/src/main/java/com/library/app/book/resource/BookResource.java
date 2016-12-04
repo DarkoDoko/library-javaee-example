@@ -1,9 +1,11 @@
 package com.library.app.book.resource;
 
+import com.google.gson.JsonElement;
 import com.library.app.FieldNotValidException;
 import com.library.app.author.AuthorNotFoundException;
 import com.library.app.book.BookNotFoundException;
 import com.library.app.book.model.Book;
+import com.library.app.book.model.BookFilter;
 import com.library.app.book.services.BookServices;
 import com.library.app.category.CategoryNotFoundException;
 import com.library.app.common.model.HttpCode;
@@ -13,7 +15,10 @@ import static com.library.app.common.model.StandardsOperationResults.getOperatio
 import static com.library.app.common.model.StandardsOperationResults.getOperationResultInvalidField;
 import static com.library.app.common.model.StandardsOperationResults.getOperationResultNotFound;
 import com.library.app.json.JsonUtils;
+import com.library.app.json.JsonWriter;
 import com.library.app.json.OperationResultJsonWriter;
+import com.library.app.pagination.PaginatedData;
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -129,4 +134,20 @@ public class BookResource {
 		return responseBuilder.build();
 	}
     
+    @GET
+	@PermitAll
+	public Response findByFilter() {
+
+		BookFilter bookFilter = new BookFilterExtractorFromUrl(uriInfo).getFilter();
+		logger.debug("Finding books using filter: {}", bookFilter);
+
+		PaginatedData<Book> books = bookServices.findByFilter(bookFilter);
+
+		logger.debug("Found {} books", books.getNumberOfRows());
+
+		JsonElement jsonWithPagingAndEntries = JsonUtils.getJsonElementWithPagingAndEntries(books,
+				bookJsonConverter);
+		return Response.status(HttpCode.OK.getCode()).entity(JsonWriter.writeToString(jsonWithPagingAndEntries))
+				.build();
+	}   
 }

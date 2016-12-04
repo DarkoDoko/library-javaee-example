@@ -10,6 +10,7 @@ import static com.library.app.book.BookForTestsRepository.cleanCode;
 import static com.library.app.book.BookForTestsRepository.designPatterns;
 import com.library.app.book.BookNotFoundException;
 import com.library.app.book.model.Book;
+import com.library.app.book.model.BookFilter;
 import com.library.app.book.services.BookServices;
 import com.library.app.category.CategoryNotFoundException;
 import com.library.app.category.model.Category;
@@ -20,7 +21,10 @@ import static com.library.app.commontests.utils.FileTestNameUtils.getPathFileRes
 import static com.library.app.commontests.utils.JsonTestUtils.assertJsonMatchesExpectedJson;
 import static com.library.app.commontests.utils.JsonTestUtils.assertJsonMatchesFileContent;
 import static com.library.app.commontests.utils.JsonTestUtils.readJsonFile;
+import com.library.app.pagination.PaginatedData;
 import java.util.Arrays;
+import java.util.List;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -31,6 +35,7 @@ import org.junit.Test;
 import static org.mockito.Matchers.anyObject;
 import org.mockito.Mock;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 
@@ -136,6 +141,29 @@ public class BookResourceTest {
 
 		Response response = bookResourceUnderTest.findById(1L);
 		assertThat(response.getStatus(), is(equalTo(HttpCode.NOT_FOUND.getCode())));
+	}
+    
+    @Test
+	public void findByBookNoFilter() {
+		List<Book> books = Arrays.asList(bookWithId(cleanCode(), 1L), bookWithId(designPatterns(), 2L));
+		Long currentCategoryId = 1L;
+		Long currentAuthorId = 1L;
+		for (Book book : books) {
+			book.getCategory().setId(currentCategoryId++);
+			for (int i = 0; i < book.getAuthors().size(); i++) {
+				book.getAuthors().get(i).setId(currentAuthorId++);
+			}
+		}
+
+		MultivaluedMap<String, String> multiMap = mock(MultivaluedMap.class);
+		when(uriInfo.getQueryParameters()).thenReturn(multiMap);
+
+		when(bookServices.findByFilter((BookFilter) anyObject())).thenReturn(
+				new PaginatedData<>(books.size(), books));
+
+		Response response = bookResourceUnderTest.findByFilter();
+		assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
+		assertJsonResponseWithFile(response, "booksAllInOnePage.json");
 	}
     
     private void addBookWithValidationError(final Exception exceptionToBeThrown, final String requestFileName,
