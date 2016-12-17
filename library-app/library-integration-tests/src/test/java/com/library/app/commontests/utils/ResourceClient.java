@@ -14,7 +14,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 public class ResourceClient {
-    private URL urlBase;
+    private final URL urlBase;
     private String resourcePath;
     private User user;
 

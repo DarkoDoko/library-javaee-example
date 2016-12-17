@@ -9,8 +9,8 @@ import javax.ws.rs.core.MultivaluedMap;
 
 public class HttpBasicAuthenticator implements ClientRequestFilter{
     
-    private String user;
-    private String password;
+    private final String user;
+    private final String password;
 
     public HttpBasicAuthenticator(String user, String password) {
         this.user = user;
