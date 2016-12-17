@@ -21,6 +21,11 @@ public class IntTestUtils {
         return assertResponseIsCreatedAndGetId(response);
     }
     
+    public static Long addElementWithContentAndGetId(ResourceClient client, String path, String content){
+        Response response = client.resourcePath(path).postWithContent(content);
+        return assertResponseIsCreatedAndGetId(response);
+    }
+    
     public static String findById(ResourceClient client, String path, Long id){
         Response response = client.resourcePath(path + "/" + id).get();
         
