@@ -23,6 +23,7 @@ public class AuthorResourceDB {
     @Inject
     private AuthorServices services;
     
+    @Inject
     private  AuthorJsonConverter jsonConverter;
     
     @POST
