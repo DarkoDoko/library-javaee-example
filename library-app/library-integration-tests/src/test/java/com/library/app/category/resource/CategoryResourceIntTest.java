@@ -18,6 +18,7 @@ import static com.library.app.commontests.utils.IntTestUtils.assertJsonHasTheNum
 import static com.library.app.commontests.utils.JsonTestUtils.assertJsonMatchesFileContent;
 import com.library.app.commontests.utils.ResourceClient;
 import static com.library.app.user.UserForTestsRepository.admin;
+import static com.library.app.user.UserForTestsRepository.johnDoe;
 import java.io.File;
 import java.net.URL;
 import javax.ws.rs.core.Response;
@@ -145,6 +146,27 @@ public class CategoryResourceIntTest {
         assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
         assertResponseContainsTheCategories(response, 4, architecture(), cleanCode(), java(), networks());
     }
+    
+    @Test
+	@RunAsClient
+	public void findAllCategoriesWithNoUser() {
+		final Response response = resourceClient.user(null).resourcePath(PATH_RESOURCE).get();
+		assertThat(response.getStatus(), is(equalTo(HttpCode.UNAUTHORIZED.getCode())));
+	}
+
+	@Test
+	@RunAsClient
+	public void findAllCategoriesWithUserCustomer() {
+		final Response response = resourceClient.user(johnDoe()).resourcePath(PATH_RESOURCE).get();
+		assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
+	}
+
+	@Test
+	@RunAsClient
+	public void findCategoryByIdWithUserCustomer() {
+		final Response response = resourceClient.user(johnDoe()).resourcePath(PATH_RESOURCE + "/999").get();
+		assertThat(response.getStatus(), is(equalTo(HttpCode.FORBIDDEN.getCode())));
+	}
     
     private void assertResponseContainsTheCategories(Response response, int expectedTotalRecords, Category... expectedCategories){
         
