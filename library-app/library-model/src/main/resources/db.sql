@@ -19,7 +19,7 @@ create table lib_user (
     id bigserial not null primary key,
     created_at timestamp not null,
     name varchar(40) not null,
-    email varchar(70) not null,
+    email varchar(70) not null unique,
     password varchar(100) not null,
     type varchar(20) not null 
 );
