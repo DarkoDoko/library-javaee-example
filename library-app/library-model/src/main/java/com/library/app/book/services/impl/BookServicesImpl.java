@@ -1,8 +1,6 @@
 package com.library.app.book.services.impl;
 
-import com.library.app.FieldNotValidException;
 import com.library.app.ValidationUtils;
-import com.library.app.author.AuthorNotFoundException;
 import com.library.app.author.model.Author;
 import com.library.app.author.services.AuthorServices;
 import com.library.app.book.BookNotFoundException;
@@ -10,14 +8,11 @@ import com.library.app.book.model.Book;
 import com.library.app.book.model.BookFilter;
 import com.library.app.book.repository.BookRepository;
 import com.library.app.book.services.BookServices;
-import com.library.app.category.CategoryNotFoundException;
 import com.library.app.category.model.Category;
 import com.library.app.category.services.CategoryServices;
 import com.library.app.pagination.PaginatedData;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.validation.Validator;
@@ -48,7 +43,7 @@ public class BookServicesImpl implements BookServices{
     }
 
     @Override
-    public void update(Book book) throws FieldNotValidException, CategoryNotFoundException, AuthorNotFoundException, BookNotFoundException {
+    public void update(Book book) {
         ValidationUtils.validateEntityFields(validator, book);
         
         if(!bookRepository.existsById(book.getId())) {
@@ -62,7 +57,7 @@ public class BookServicesImpl implements BookServices{
     }
 
     @Override
-    public Book findById(Long id) throws BookNotFoundException {
+    public Book findById(Long id) {
         Book book = bookRepository.findById(id);
         if(book == null) {
             throw new BookNotFoundException();
