@@ -24,6 +24,7 @@ import static com.library.app.commontests.utils.JsonTestUtils.assertJsonMatchesF
 import com.library.app.commontests.utils.ResourceClient;
 import com.library.app.json.JsonReader;
 import static com.library.app.user.UserForTestsRepository.admin;
+import static com.library.app.user.UserForTestsRepository.johnDoe;
 import java.net.URL;
 import javax.ws.rs.core.Response;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -124,6 +125,27 @@ public class AuthorResourceIntTest {
         assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
         assertResponseContainsTheAuthors(response, 12, erichGamma(), donRoberts());
     }
+    
+    @Test
+	@RunAsClient
+	public void findByFilterWithNoUser() {
+		final Response response = resourceClient.user(null).resourcePath(PATH_RESOURCE).get();
+		assertThat(response.getStatus(), is(equalTo(HttpCode.UNAUTHORIZED.getCode())));
+	}
+
+	@Test
+	@RunAsClient
+	public void findByFilterWithUserCustomer() {
+		final Response response = resourceClient.user(johnDoe()).resourcePath(PATH_RESOURCE).get();
+		assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
+	}
+
+	@Test
+	@RunAsClient
+	public void findByIdIdWithUserCustomer() {
+		final Response response = resourceClient.user(johnDoe()).resourcePath(PATH_RESOURCE + "/999").get();
+		assertThat(response.getStatus(), is(equalTo(HttpCode.FORBIDDEN.getCode())));
+	}
     
     private Long addAuthorAndGetId(final String fileName) {
         return IntTestUtils.addElementWithFileAndGetId(resourceClient, PATH_RESOURCE, PATH_RESOURCE, fileName);
