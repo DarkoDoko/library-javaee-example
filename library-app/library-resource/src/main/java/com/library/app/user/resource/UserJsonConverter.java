@@ -43,7 +43,7 @@ public class UserJsonConverter implements EntityJsonConverter<User> {
         });
         
         jsonObject.add("roles", roles);
-        jsonObject.addProperty("createdAt", DateUtils.fomatDateTime(user.getCreatedAt()));
+        jsonObject.addProperty("createdAt", DateUtils.formatDateTime(user.getCreatedAt()));
         
         return jsonObject;
     }

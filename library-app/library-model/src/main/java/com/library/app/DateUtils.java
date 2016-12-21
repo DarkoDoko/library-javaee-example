@@ -18,7 +18,7 @@ public final class DateUtils {
         }
     }
     
-    public static String fomatDateTime(Date date) {
+    public static String formatDateTime(Date date) {
         return new SimpleDateFormat(FORMAT).format(date);
     }
 }
