@@ -141,7 +141,7 @@ public class Order implements Serializable{
         this.historyEntries = historyEntries;
     }
     
-    public void addHistoryEvent(OrderStatus status) {
+    public void addHistoryEntry(OrderStatus status) {
         if(this.currentStatus != null) {
             if(this.currentStatus != OrderStatus.RESERVED) {
                 throw new IllegalArgumentException("An order in the state " + currentStatus + " cannot have its state changed.");
@@ -163,7 +163,7 @@ public class Order implements Serializable{
         this.currentStatus = currentStatus;
     }
     
-    public void setInitialState() {
+    public void setInitialStatus() {
         getHistoryEntries().clear();
         setCurrentStatus(OrderStatus.RESERVED);
     }
