@@ -123,7 +123,7 @@ public class Order implements Serializable{
     }
     
     public void calculateTotal() {
-        this.total = 0D;
+        this.total = 0D;        
         getItems().forEach((item) -> {
             item.calculatePrice();
             this.total += item.getPrice();
@@ -165,7 +165,8 @@ public class Order implements Serializable{
     
     public void setInitialStatus() {
         getHistoryEntries().clear();
-        setCurrentStatus(OrderStatus.RESERVED);
+        setCurrentStatus(null);
+        addHistoryEntry(OrderStatus.RESERVED);
     }
 
     @Override
