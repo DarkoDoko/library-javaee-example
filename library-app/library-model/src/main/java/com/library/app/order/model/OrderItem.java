@@ -56,7 +56,7 @@ public class OrderItem implements Serializable{
     }
     
     public void calculatePrice() {
-        if(book != null && price != null) {
+        if(book != null && quantity != null) {
             price = book.getPrice() * quantity;
         }
     }
