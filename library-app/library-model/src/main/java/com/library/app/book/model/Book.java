@@ -59,6 +59,13 @@ public class Book implements Serializable{
     @NotNull
     private Double price;
 
+    public Book() {
+    }
+
+    public Book(Long id) {
+        this.id = id;
+    }
+
     public Long getId() {
         return id;
     }
