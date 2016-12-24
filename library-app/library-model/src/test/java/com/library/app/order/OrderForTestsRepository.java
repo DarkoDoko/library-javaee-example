@@ -1,14 +1,12 @@
 package com.library.app.order;
 
 import com.library.app.DateUtils;
-import com.library.app.book.BookForTestsRepository;
 import static com.library.app.book.BookForTestsRepository.bookWithId;
 import static com.library.app.book.BookForTestsRepository.designPatterns;
 import static com.library.app.book.BookForTestsRepository.refactoring;
 import com.library.app.book.model.Book;
 import com.library.app.order.model.Order;
 import com.library.app.order.model.Order.OrderStatus;
-import com.library.app.user.UserForTestsRepository;
 import static com.library.app.user.UserForTestsRepository.johnDoe;
 import static com.library.app.user.UserForTestsRepository.mary;
 import com.library.app.user.model.Customer;
@@ -28,6 +26,13 @@ public class OrderForTestsRepository {
         
         order.setInitialStatus();
         order.calculateTotal();
+        
+        //Make sure orders have different timestamps
+        try {
+            Thread.sleep(1);
+        } catch(InterruptedException e) {
+            System.out.println(e.getMessage());
+        }
         
         order.addHistoryEntry(OrderStatus.DELIVERED);
         return order;
