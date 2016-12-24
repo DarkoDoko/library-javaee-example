@@ -22,6 +22,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -47,6 +48,7 @@ public class Order implements Serializable{
     @CollectionTable(name = "lib_order_item", joinColumns = @JoinColumn(name = "order_id"))
     @NotNull
     @Size(min = 1)
+    @Valid
     private Set<OrderItem> items;
     
     @NotNull
@@ -63,6 +65,7 @@ public class Order implements Serializable{
     @CollectionTable(name = "lib_order_history", joinColumns = @JoinColumn(name = "order_id"))
     @NotNull
     @Size(min = 1)
+    @Valid
     private Set<OrderHistoryEntry> historyEntries;
     
     @Column(name = "current_status")
