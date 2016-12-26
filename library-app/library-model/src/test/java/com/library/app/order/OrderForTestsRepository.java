@@ -5,6 +5,7 @@ import static com.library.app.book.BookForTestsRepository.bookWithId;
 import static com.library.app.book.BookForTestsRepository.designPatterns;
 import static com.library.app.book.BookForTestsRepository.refactoring;
 import com.library.app.book.model.Book;
+import static com.library.app.commontests.utils.TestRepositoryUtils.findByPropertyNameAndValue;
 import com.library.app.order.model.Order;
 import com.library.app.order.model.Order.OrderStatus;
 import static com.library.app.user.UserForTestsRepository.johnDoe;
@@ -72,10 +73,4 @@ public class OrderForTestsRepository {
         return order;
     }
     
-    private static <T> T findByPropertyNameAndValue(EntityManager em, Class<T> clazz, String propertyName, String propertyValue) {
-        return (T) em.createQuery("SELECT o FROM " + clazz.getSimpleName() + " o "
-                                + "WHERE o." + propertyName + " =:propertyValue")
-                    .setParameter("propertyValue", propertyValue)
-                    .getSingleResult();
-    }
 }

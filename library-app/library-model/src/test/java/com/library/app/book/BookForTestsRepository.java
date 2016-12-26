@@ -6,6 +6,7 @@ import com.library.app.book.model.Book;
 import com.library.app.category.CategoryForTestsRepository;
 import static com.library.app.category.CategoryForTestsRepository.*;
 import com.library.app.category.model.Category;
+import static com.library.app.commontests.utils.TestRepositoryUtils.findByPropertyNameAndValue;
 import java.util.Arrays;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -94,15 +95,4 @@ public class BookForTestsRepository {
 
 		return book;
 	}
-
-	private static <T> T findByPropertyNameAndValue(EntityManager em, Class<T> clazz, String propertyName, 
-        String propertyValue) {
-		
-        return (T) em
-				.createQuery("SELECT o FROM " + clazz.getSimpleName() +
-						" o WHERE o." + propertyName + " = :propertyValue")
-				.setParameter("propertyValue", propertyValue)
-				.getSingleResult();
-	}
-    
 }
