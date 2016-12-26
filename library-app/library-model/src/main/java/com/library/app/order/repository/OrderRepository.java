@@ -25,6 +25,17 @@ public class OrderRepository extends GenericRepository<Order>{
     protected EntityManager getEntityManager() {
         return em;
     }
+
+    @Override
+    public Order findById(Long id) {
+        Order order = super.findById(id);
+        if(order != null){
+            order.getItems().size();
+            order.getHistoryEntries().size();
+        }
+        
+        return order;
+    }
     
     public PaginatedData<Order> findByFilter(OrderFilter orderFilter) {
         StringBuilder clause = new StringBuilder("WHERE e.id IS NOT NULL");
