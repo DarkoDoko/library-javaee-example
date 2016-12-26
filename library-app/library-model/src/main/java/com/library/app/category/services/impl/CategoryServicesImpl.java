@@ -6,12 +6,18 @@ import com.library.app.category.model.Category;
 import com.library.app.category.repository.CategoryRepository;
 import com.library.app.category.services.CategoryServices;
 import com.library.app.ValidationUtils;
+import com.library.app.logaudit.interceptor.Auditable;
+import com.library.app.logaudit.interceptor.LogAuditInterceptor;
+import com.library.app.logaudit.model.LogAudit;
+import com.library.app.logaudit.model.LogAudit.Action;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.interceptor.Interceptors;
 import javax.validation.Validator;
 
 @Stateless
+@Interceptors(LogAuditInterceptor.class)
 public class CategoryServicesImpl implements CategoryServices{
 
     @Inject
@@ -21,6 +27,7 @@ public class CategoryServicesImpl implements CategoryServices{
     CategoryRepository repository;
     
     @Override
+    @Auditable(action = Action.ADD)
     public Category add(Category category) {
         
         validateCategory(category);
@@ -29,6 +36,7 @@ public class CategoryServicesImpl implements CategoryServices{
     }
 
     @Override
+    @Auditable(action = Action.UPDATE)
     public void update(Category category) {
         validateCategory(category);
         

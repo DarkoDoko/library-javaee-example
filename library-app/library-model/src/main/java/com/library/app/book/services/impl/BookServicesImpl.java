@@ -10,14 +10,20 @@ import com.library.app.book.repository.BookRepository;
 import com.library.app.book.services.BookServices;
 import com.library.app.category.model.Category;
 import com.library.app.category.services.CategoryServices;
+import com.library.app.logaudit.interceptor.Auditable;
+import com.library.app.logaudit.interceptor.LogAuditInterceptor;
+import com.library.app.logaudit.model.LogAudit;
+import com.library.app.logaudit.model.LogAudit.Action;
 import com.library.app.pagination.PaginatedData;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.interceptor.Interceptors;
 import javax.validation.Validator;
 
 @Stateless
+@Interceptors(LogAuditInterceptor.class)
 public class BookServicesImpl implements BookServices{
     
     @Inject
@@ -33,6 +39,7 @@ public class BookServicesImpl implements BookServices{
     CategoryServices categoryServices;
     
     @Override
+    @Auditable(action = Action.ADD)
     public Book add(Book book) {
         ValidationUtils.validateEntityFields(validator, book);
         
@@ -43,6 +50,7 @@ public class BookServicesImpl implements BookServices{
     }
 
     @Override
+    @Auditable(action = Action.UPDATE)
     public void update(Book book) {
         ValidationUtils.validateEntityFields(validator, book);
         
