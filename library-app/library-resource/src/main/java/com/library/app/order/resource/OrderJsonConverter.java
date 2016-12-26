@@ -12,7 +12,9 @@ import com.library.app.order.model.OrderHistoryEntry;
 import com.library.app.order.model.OrderItem;
 import com.library.app.user.model.User;
 import java.util.List;
+import javax.enterprise.context.ApplicationScoped;
 
+@ApplicationScoped
 public class OrderJsonConverter implements EntityJsonConverter<Order>{
 
     @Override
