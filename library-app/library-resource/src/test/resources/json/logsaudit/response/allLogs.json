@@ -28,7 +28,7 @@
             "createdAt": "2015-01-10T19:32:22Z",
             "user": {
                 "id": 2,
-                "name": "John doe"
+                "name": "John Doe"
             },
             "action": "ADD",
             "element": "Order"
