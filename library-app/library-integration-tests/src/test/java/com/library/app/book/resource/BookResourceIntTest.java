@@ -20,6 +20,9 @@ import static com.library.app.commontests.utils.JsonTestUtils.assertJsonMatchesF
 import com.library.app.commontests.utils.ResourceClient;
 import com.library.app.json.JsonReader;
 import com.library.app.json.JsonWriter;
+import static com.library.app.logaudit.LogAuditTestUtils.assertAuditLogs;
+import com.library.app.logaudit.model.LogAudit;
+import com.library.app.logaudit.model.LogAudit.Action;
 import static com.library.app.user.UserForTestsRepository.admin;
 import static com.library.app.user.UserForTestsRepository.johnDoe;
 import java.net.URL;
@@ -46,6 +49,7 @@ public class BookResourceIntTest {
     private ResourceClient resourceClient;
     
     private static final String PATH_RESOURCE = "books";
+    private static final String ELEMENT_NAME = Book.class.getSimpleName();
     
     @Deployment
     public static WebArchive createDeployment() {
@@ -69,6 +73,8 @@ public class BookResourceIntTest {
     public void addValidBookAndFindIt() {
         Long bookId = addBookAndGetId(normalizeDependenciesWithRest(designPatterns()));
         findBookAndAssertResponseWithBook(bookId, designPatterns());
+        
+		assertAuditLogs(resourceClient, 1, new LogAudit(admin(), Action.ADD, ELEMENT_NAME));
     }
     
     @Test
@@ -77,6 +83,8 @@ public class BookResourceIntTest {
 		Book book = normalizeDependenciesWithRest(cleanCode());
 		book.setTitle(null);
 		addBookWithValidationError(book, "bookErrorNullTitle.json");
+        
+		assertAuditLogs(resourceClient, 0);
 	}
 
 	@Test
@@ -85,6 +93,8 @@ public class BookResourceIntTest {
 		final Book book = normalizeDependenciesWithRest(cleanCode());
 		book.getCategory().setId(999L);
 		addBookWithValidationError(book, "bookErrorInexistentCategory.json");
+        
+		assertAuditLogs(resourceClient, 0);
 	}
 
 	@Test
@@ -93,6 +103,8 @@ public class BookResourceIntTest {
 		final Book book = normalizeDependenciesWithRest(cleanCode());
 		book.getAuthors().get(0).setId(999L);
 		addBookWithValidationError(book, "bookErrorInexistentAuthor.json");
+        
+		assertAuditLogs(resourceClient, 0);
 	}
     
     @Test
@@ -112,6 +124,9 @@ public class BookResourceIntTest {
 		assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
 
 		findBookAndAssertResponseWithBook(bookId, book);
+        
+        assertAuditLogs(resourceClient, 2, new LogAudit(admin(), Action.ADD, ELEMENT_NAME), new LogAudit(admin(),
+				Action.UPDATE, ELEMENT_NAME));
 	}
 
 	@Test
@@ -123,6 +138,8 @@ public class BookResourceIntTest {
                             putWithContent(getJsonForBook(book));
         
 		assertThat(response.getStatus(), is(equalTo(HttpCode.NOT_FOUND.getCode())));
+        
+        assertAuditLogs(resourceClient, 0);
 	}
 
     @Test
@@ -130,6 +147,8 @@ public class BookResourceIntTest {
 	public void findBookNotFound() {
 		Response response = resourceClient.resourcePath(PATH_RESOURCE + "/" + 999).get();
 		assertThat(response.getStatus(), is(equalTo(HttpCode.NOT_FOUND.getCode())));
+        
+        assertAuditLogs(resourceClient, 0);
 	}
 
 	@Test
@@ -153,6 +172,8 @@ public class BookResourceIntTest {
 	public void findByFilterWithNoUser() {
 		Response response = resourceClient.user(null).resourcePath(PATH_RESOURCE).get();
 		assertThat(response.getStatus(), is(equalTo(HttpCode.UNAUTHORIZED.getCode())));
+        
+        assertAuditLogs(resourceClient, 0);
 	}
 
 	@Test
@@ -160,6 +181,8 @@ public class BookResourceIntTest {
 	public void findByFilterWithUserCustomer() {
 		Response response = resourceClient.user(johnDoe()).resourcePath(PATH_RESOURCE).get();
 		assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
+        
+        assertAuditLogs(resourceClient, 0);
 	}
 
 	@Test
@@ -167,6 +190,8 @@ public class BookResourceIntTest {
 	public void findByIdIdWithUserCustomer() {
 		Response response = resourceClient.user(johnDoe()).resourcePath(PATH_RESOURCE + "/999").get();
 		assertThat(response.getStatus(), is(equalTo(HttpCode.FORBIDDEN.getCode())));
+        
+        assertAuditLogs(resourceClient, 0);
 	}
     
     private void addBookWithValidationError(Book bookToAdd, String responseFileName) {

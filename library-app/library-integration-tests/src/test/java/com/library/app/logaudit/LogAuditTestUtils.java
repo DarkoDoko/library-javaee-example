@@ -14,15 +14,14 @@ import static org.junit.Assert.assertThat;
 
 public class LogAuditTestUtils {
     
-	public static void assertAuditLogs(final ResourceClient resourceClient, final int expectedTotalRecords,
-			final LogAudit... expectedLogsAudit) {
+	public static void assertAuditLogs(ResourceClient resourceClient, int expectedTotalRecords, LogAudit... expectedLogsAudit) {
 
-		final String resourceName = "logsaudit";
-		final Response response = resourceClient.user(admin())
+		String resourceName = "logsaudit";
+		Response response = resourceClient.user(admin())
 				.resourcePath(resourceName + "?page=0&per_page=10&sort=+createdAt").get();
 		assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
 
-		final JsonArray logsList = IntTestUtils.assertJsonHasTheNumberOfElementsAndReturnTheEntries(response,
+		JsonArray logsList = IntTestUtils.assertJsonHasTheNumberOfElementsAndReturnTheEntries(response,
 				expectedTotalRecords, expectedLogsAudit.length);
 
 		for (int i = 0; i < expectedLogsAudit.length; i++) {

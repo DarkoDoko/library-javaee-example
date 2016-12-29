@@ -23,6 +23,9 @@ import com.library.app.commontests.utils.IntTestUtils;
 import static com.library.app.commontests.utils.JsonTestUtils.assertJsonMatchesFileContent;
 import com.library.app.commontests.utils.ResourceClient;
 import com.library.app.json.JsonReader;
+import static com.library.app.logaudit.LogAuditTestUtils.assertAuditLogs;
+import com.library.app.logaudit.model.LogAudit;
+import com.library.app.logaudit.model.LogAudit.Action;
 import static com.library.app.user.UserForTestsRepository.admin;
 import static com.library.app.user.UserForTestsRepository.johnDoe;
 import java.net.URL;
@@ -48,6 +51,7 @@ public class AuthorResourceIntTest {
     private ResourceClient resourceClient;
     
     private static final String PATH_RESOURCE = "authors";
+    private static final String ELEMENT_NAME = Author.class.getSimpleName();
     
     @Deployment
     public static WebArchive createDeployment() {
@@ -67,6 +71,8 @@ public class AuthorResourceIntTest {
     public void addValidAuthorAndFindIt() {
         final Long authorId = addAuthorAndGetId("robertMartin.json");
         findAuthorAndAssertResponseWithAuthor(authorId, robertMartin());
+
+		assertAuditLogs(resourceClient, 1, new LogAudit(admin(), Action.ADD, ELEMENT_NAME));
     }
 
     @Test
@@ -77,6 +83,8 @@ public class AuthorResourceIntTest {
 
         assertThat(response.getStatus(), is(equalTo(HttpCode.VALIDATION_ERROR.getCode())));
         assertJsonResponseWithFile(response, "authorErrorNullName.json");
+        
+        assertAuditLogs(resourceClient, 0);
     }
 
     @Test
@@ -92,6 +100,9 @@ public class AuthorResourceIntTest {
         final Author uncleBob = new Author();
         uncleBob.setName("Uncle Bob");
         findAuthorAndAssertResponseWithAuthor(authorId, uncleBob);
+        
+        assertAuditLogs(resourceClient, 2, new LogAudit(admin(), Action.ADD, ELEMENT_NAME), new LogAudit(admin(),
+				Action.UPDATE, ELEMENT_NAME));
     }
 
     @Test
@@ -100,6 +111,8 @@ public class AuthorResourceIntTest {
         final Response response = resourceClient.resourcePath(PATH_RESOURCE + "/" + 999).putWithFile(
                         getPathFileRequest(PATH_RESOURCE, "robertMartin.json"));
         assertThat(response.getStatus(), is(equalTo(HttpCode.NOT_FOUND.getCode())));
+        
+        assertAuditLogs(resourceClient, 0);
     }
 
     @Test
@@ -107,6 +120,8 @@ public class AuthorResourceIntTest {
     public void findAuthorNotFound() {
         final Response response = resourceClient.resourcePath(PATH_RESOURCE + "/" + 999).get();
         assertThat(response.getStatus(), is(equalTo(HttpCode.NOT_FOUND.getCode())));
+        
+        assertAuditLogs(resourceClient, 0);
     }
 
     @Test
@@ -131,6 +146,8 @@ public class AuthorResourceIntTest {
 	public void findByFilterWithNoUser() {
 		final Response response = resourceClient.user(null).resourcePath(PATH_RESOURCE).get();
 		assertThat(response.getStatus(), is(equalTo(HttpCode.UNAUTHORIZED.getCode())));
+        
+        assertAuditLogs(resourceClient, 0);
 	}
 
 	@Test
@@ -138,6 +155,8 @@ public class AuthorResourceIntTest {
 	public void findByFilterWithUserCustomer() {
 		final Response response = resourceClient.user(johnDoe()).resourcePath(PATH_RESOURCE).get();
 		assertThat(response.getStatus(), is(equalTo(HttpCode.OK.getCode())));
+        
+        assertAuditLogs(resourceClient, 0);
 	}
 
 	@Test
@@ -145,6 +164,8 @@ public class AuthorResourceIntTest {
 	public void findByIdIdWithUserCustomer() {
 		final Response response = resourceClient.user(johnDoe()).resourcePath(PATH_RESOURCE + "/999").get();
 		assertThat(response.getStatus(), is(equalTo(HttpCode.FORBIDDEN.getCode())));
+        
+        assertAuditLogs(resourceClient, 0);
 	}
     
     private Long addAuthorAndGetId(final String fileName) {
