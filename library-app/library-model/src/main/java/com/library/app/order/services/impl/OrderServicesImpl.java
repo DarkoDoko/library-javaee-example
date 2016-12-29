@@ -1,9 +1,8 @@
 package com.library.app.order.services.impl;
 
-import com.library.app.FieldNotValidException;
+import com.library.app.DateUtils;
 import com.library.app.UserNotAuthorizedException;
 import com.library.app.ValidationUtils;
-import com.library.app.book.BookNotFoundException;
 import com.library.app.book.model.Book;
 import com.library.app.book.services.BookServices;
 import com.library.app.order.OrderNotFoundException;
@@ -95,6 +94,17 @@ public class OrderServicesImpl implements OrderServices{
     public PaginatedData<Order> findByFilter(OrderFilter filter) {
         return repository.findByFilter(filter);
     }
+    
+    @Override
+    public void changeStatusOfExpiredOrders(int daysBeforeOrderExpiration) {
+        
+        OrderFilter filter = new OrderFilter();
+        filter.setEndDate(DateUtils.currentDatePlusDays(-daysBeforeOrderExpiration));
+        filter.setStatus(OrderStatus.RESERVED);
+        
+        PaginatedData<Order> ordersToBeExpired = findByFilter(filter);
+        ordersToBeExpired.getRows().forEach((order) -> updateStatus(order.getId(), OrderStatus.RESERVATION_EXPIRED));
+    }
 
     private void checkCustomerAndSetItOnOrder(Order order) {
         User user = userServices.findByEmail(sessionContext.getCallerPrincipal().getName());
@@ -108,6 +118,5 @@ public class OrderServicesImpl implements OrderServices{
                 item.setBook(book);
             }
         });
-    }
-    
+    } 
 }
