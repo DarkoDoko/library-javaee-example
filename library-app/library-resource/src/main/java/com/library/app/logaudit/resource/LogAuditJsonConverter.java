@@ -6,7 +6,9 @@ import com.library.app.DateUtils;
 import com.library.app.json.EntityJsonConverter;
 import com.library.app.logaudit.model.LogAudit;
 import com.library.app.user.model.User;
+import javax.enterprise.context.ApplicationScoped;
 
+@ApplicationScoped
 public class LogAuditJsonConverter implements EntityJsonConverter<LogAudit>{
 
     @Override
