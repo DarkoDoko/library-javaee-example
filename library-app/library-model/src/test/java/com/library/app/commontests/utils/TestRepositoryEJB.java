@@ -24,9 +24,11 @@ public class TestRepositoryEJB {
         Category.class, Author.class);
     
     public void deleteAll(){
-        ENTITIES_TO_REMOVE.forEach((entityClass) -> {
-            deleteAllForEntity(entityClass);
-        });
+        ENTITIES_TO_REMOVE.forEach((entityClass) -> deleteAllForEntity(entityClass));
+    }
+    
+    public void add(Object entity){
+        em.persist(entity);
     }
     
     private void deleteAllForEntity(Class<?> entityClass){
